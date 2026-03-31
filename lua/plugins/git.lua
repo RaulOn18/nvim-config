@@ -13,6 +13,16 @@ return {
         topdelete = { text = "‾" },
         changedelete = { text = "~" },
       },
+      -- Enable virtual text blame line otomatis
+      current_line_blame = true,
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = 'eol',
+        delay = 300,
+        ignore_whitespace = false,
+        virt_text_priority = 100,
+      },
+      current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d> - <summary>',
       on_attach = function(bufnr)
         local gs = package.loaded.gitsigns
         
@@ -43,7 +53,7 @@ return {
         map("n", "<leader>hR", gs.reset_buffer)
         map("n", "<leader>hp", gs.preview_hunk)
         map("n", "<leader>hb", function() gs.blame_line({ full = true }) end)
-        map("n", "<leader>tb", gs.toggle_current_line_blame)
+        map("n", "<leader>tbl", gs.toggle_current_line_blame)
         map("n", "<leader>hd", gs.diffthis)
         map("n", "<leader>hD", function() gs.diffthis("~") end)
         map("n", "<leader>td", gs.toggle_deleted)
