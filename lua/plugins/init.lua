@@ -11,4 +11,5 @@ return {
   { import = "plugins.debug" },     -- DAP debugging
   { import = "plugins.flutter" },   -- Flutter development
   { import = "plugins.markdown" },  -- Markdown support
+  { import = "plugins.sql" },       -- SQL editor support
 }

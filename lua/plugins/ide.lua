@@ -1,20 +1,6 @@
 -- IDE Features: Project Management, UI, and Workflow
 
 return {
-  -- Auto-session untuk project switching cepat
-  {
-    "rmagatti/auto-session",
-    lazy = false,
-    opts = {
-      suppressed_dirs = { "~/", "~/Downloads", "/", "/tmp" },
-      session_lens = {
-        load_on_setup = true,
-        theme_conf = { border = true },
-        previewer = false,
-      },
-    },
-  },
-
   -- Project management
   {
     "ahmedkhalf/project.nvim",
@@ -91,8 +77,6 @@ return {
           { "<leader>gh", group = "hunks" },
           { "<leader>q", group = "quit/session" },
           { "<leader>s", group = "search" },
-          { "<leader>x", group = "diagnostics/quickfix" },
-          { "<leader>S", group = "Session" },
           { "<leader>a", group = "AI (Augment)" },
           { "<leader>d", group = "Debug (DAP)" },
           { "<leader>h", group = "Git Hunks" },

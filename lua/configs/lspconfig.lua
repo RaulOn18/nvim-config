@@ -1,7 +1,7 @@
 require("nvchad.configs.lspconfig").defaults()
 
 -- LSP Performance Optimizations
-vim.lsp.set_log_level "OFF"
+vim.lsp.log.set_level(vim.lsp.log.levels.OFF)
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -173,6 +173,51 @@ vim.lsp.config("tailwindcss", {
   },
 })
 
+-- Dart LSP Configuration - Performance optimized untuk Flutter
+vim.lsp.config("dartls", {
+  cmd = { "dart", "language-server", "--protocol=lsp" },
+  filetypes = { "dart" },
+  root_markers = { "pubspec.yaml" },
+  settings = {
+    dart = {
+      showTodos = false,
+      completeFunctionCalls = true,
+      renameFilesWithClasses = "prompt",
+      enableSnippets = true,
+      updateImportsOnRename = true,
+      analysisExcludedFolders = {
+        vim.fn.expand "$HOME/.pub-cache",
+        vim.fn.expand "$HOME/.flutter",
+        vim.fn.expand "$HOME/AppData/Local/Pub/Cache",
+        vim.fn.expand "$HOME/fvm",
+      },
+      closingLabels = true,
+      onlyAnalyzeProjectsWithOpenFiles = true,
+      suggestFromUnimportedLibraries = true,
+    },
+  },
+  on_attach = function(client, bufnr)
+    -- Disable formatting (gunakan flutter format atau dart format via conform)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
+})
+
+-- SQL LSP Configuration
+vim.lsp.config("sqlls", {
+  cmd = { "sql-language-server", "up", "--method", "stdio" },
+  filetypes = { "sql", "mysql" },
+  root_markers = { ".git" },
+  settings = {},
+  single_file_support = true,
+  on_attach = function(client, bufnr)
+    -- Enable completion
+    client.server_capabilities.completionProvider = {
+      triggerCharacters = { ".", " ", "(" },
+    }
+  end,
+})
+
 local servers = {
   "html",
   "cssls",
@@ -180,6 +225,10 @@ local servers = {
   "tailwindcss",
   "eslint",
   "gopls",
+  "sqlls",  -- SQL Language Server
+  -- Dart LSP akan di-manage sama flutter-tools, jadi ga usah dimasukkin sini
+  -- Kecuali lu ga pake flutter-tools, uncomment baris di bawah:
+  -- "dartls",
 }
 
 vim.lsp.enable(servers)
@@ -201,17 +250,6 @@ vim.diagnostic.config {
   },
 }
 
--- FIX: Setup publishDiagnostics handler ONCE at startup (not per LSP attach)
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics,
-  {
-    update_in_insert = false,
-    virtual_text = {
-      spacing = 4,
-      prefix = "●",
-    },
-  }
-)
 
 -- Reduce flicker and improve performance
 -- FIX: Handler yang lebih robust untuk mencegah error spam

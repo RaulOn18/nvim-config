@@ -50,12 +50,6 @@ map("n", "<leader>bo", "<cmd>%bd|e#<cr>", { desc = "Close other buffers" })
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })
 
--- Sessions
-map("n", "<leader>Ss", "<cmd>SessionSave<cr>", { desc = "Save Session" })
-map("n", "<leader>Sr", "<cmd>SessionRestore<cr>", { desc = "Restore Session" })
-map("n", "<leader>Sd", "<cmd>SessionDelete<cr>", { desc = "Delete Session" })
-map("n", "<leader>Sf", "<cmd>Autosession search<cr>", { desc = "Find Session" })
-
 -- Projects
 map("n", "<leader>fp", "<cmd>Telescope projects<cr>", { desc = "Find Projects" })
 map("n", "<leader>cd", function() require("utils.project").auto_cd_git_root() end, { desc = "CD to Git Root" })
@@ -93,9 +87,31 @@ map("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location Lis
 map("n", "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List" })
 
 -- LSP shortcuts (akan aktif saat LSP attach)
+-- gd = native jump (paling cepat)
 map("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
-map("n", "gr", vim.lsp.buf.references, { desc = "Find References" })
-map("n", "gI", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
+
+-- gD = declaration dengan fallback ke definition
+map("n", "gD", function()
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  local has_declaration = false
+  for _, client in ipairs(clients) do
+    if client.supports_method("textDocument/declaration") then
+      has_declaration = true
+      break
+    end
+  end
+  
+  if has_declaration then
+    vim.lsp.buf.declaration()
+  else
+    vim.lsp.buf.definition()
+  end
+end, { desc = "Go to Declaration (or Definition)" })
+
+-- <leader>gd = Telescope picker (kalau ada multiple results)
+map("n", "<leader>gD", "<cmd>Telescope lsp_definitions<cr>", { desc = "Definition (Picker)" })
+map("n", "gr", "<cmd>Telescope lsp_references<cr>", { desc = "Find References" })
+map("n", "gI", "<cmd>Telescope lsp_implementations<cr>", { desc = "Go to Implementation" })
 map("n", "gy", vim.lsp.buf.type_definition, { desc = "Go to Type Definition" })
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
 map("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename Symbol" })

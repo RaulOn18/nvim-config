@@ -4,7 +4,7 @@
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
 vim.g.mapleader = " "
 
--- Performance: faster startup
+-- Disable shada (no session persistence)
 vim.opt.shadafile = "NONE"
 
 -- bootstrap lazy and all plugins
@@ -30,12 +30,6 @@ require("lazy").setup({
 
   { import = "plugins" },
 }, lazy_config)
-
--- Restore shada after plugins loaded
-vim.schedule(function()
-  vim.opt.shadafile = ""
-  pcall(vim.cmd.rshada, { bang = true })
-end)
 
 -- load theme
 dofile(vim.g.base46_cache .. "defaults")
