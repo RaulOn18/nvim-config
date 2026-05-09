@@ -77,22 +77,8 @@ autocmd({ "BufRead", "BufNewFile" }, {
   end,
 })
 
--- Auto-format dan organize imports on save untuk Dart files
-autocmd("BufWritePre", {
-  group = flutter_group,
-  pattern = "*.dart",
-  callback = function()
-    -- Cek apakah conform aktif, kalau ga, fallback ke LSP
-    local ok, conform = pcall(require, "conform")
-    if ok then
-      -- Biar conform yang handle formatting
-      return
-    end
-    
-    -- Fallback: pakai LSP formatting kalau conform ga ada
-    vim.lsp.buf.format({ timeout_ms = 2000 })
-  end,
-})
+-- Format on save DISABLED for Dart files
+-- Use :lua require('conform').format() or <leader>fm manually
 
 -- Set filetype untuk pubspec.yaml biar ada highlighting
 autocmd({ "BufRead", "BufNewFile" }, {
@@ -122,18 +108,6 @@ autocmd("FileType", {
   group = flutter_group,
   pattern = "dart",
   callback = function(args)
-    -- Wrap with widget shortcut
-    vim.keymap.set("n", "<leader>fw", function()
-      -- Menggunakan LSP code action untuk wrap with widget
-      vim.lsp.buf.code_action({
-        filter = function(action)
-          return action.title:match("Wrap with widget") or 
-                 action.title:match("Wrap with")
-        end,
-        apply = true,
-      })
-    end, { buffer = args.buf, desc = "Flutter: Wrap with widget" })
-    
     -- Extract widget
     vim.keymap.set("n", "<leader>fe", function()
       vim.lsp.buf.code_action({
