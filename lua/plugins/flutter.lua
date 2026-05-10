@@ -44,11 +44,6 @@ return {
           enabled = true,
         },
         lsp = {
-          color = {
-            enabled = true,
-            virtual_text = true,
-            virtual_text_str = "■",
-          },
           on_attach = function(client, bufnr)
             -- NvChad on_attach integration
             local ok_nvchad, nvconfig = pcall(require, "nvchad.configs.lspconfig")
@@ -65,6 +60,9 @@ return {
             map("n", "<leader>Fq", "<cmd>FlutterQuit<cr>", { desc = "Flutter Quit", buffer = bufnr })
             map("n", "<leader>Fc", "<cmd>FlutterReload<cr>", { desc = "Hot Reload", buffer = bufnr })
             map("n", "<leader>Ft", "<cmd>Telescope flutter commands<cr>", { desc = "Flutter Commands", buffer = bufnr })
+
+            -- Document Colors (Neovim 0.12+)
+            vim.lsp.document_color.enable(true, bufnr)
 
             -- Force Enable Code Action Provider
             client.server_capabilities.codeActionProvider = true
