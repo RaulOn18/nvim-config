@@ -173,35 +173,8 @@ vim.lsp.config("tailwindcss", {
   },
 })
 
--- Dart LSP Configuration - Performance optimized untuk Flutter
-vim.lsp.config("dartls", {
-  cmd = { "dart", "language-server", "--protocol=lsp" },
-  filetypes = { "dart" },
-  root_markers = { "pubspec.yaml" },
-  settings = {
-    dart = {
-      showTodos = false,
-      completeFunctionCalls = true,
-      renameFilesWithClasses = "prompt",
-      enableSnippets = true,
-      updateImportsOnRename = true,
-      analysisExcludedFolders = {
-        vim.fn.expand "$HOME/.pub-cache",
-        vim.fn.expand "$HOME/.flutter",
-        vim.fn.expand "$HOME/AppData/Local/Pub/Cache",
-        vim.fn.expand "$HOME/fvm",
-      },
-      closingLabels = true,
-      onlyAnalyzeProjectsWithOpenFiles = true,
-      suggestFromUnimportedLibraries = true,
-    },
-  },
-  on_attach = function(client, bufnr)
-    -- Disable formatting (gunakan flutter format atau dart format via conform)
-    client.server_capabilities.documentFormattingProvider = false
-    client.server_capabilities.documentRangeFormattingProvider = false
-  end,
-})
+-- Dart LSP: DI-MANAGE SAMA flutter-tools, jangan define di sini
+-- Config dartls dihapus untuk hindari konflik double LSP attach
 
 -- SQL LSP Configuration
 vim.lsp.config("sqlls", {
