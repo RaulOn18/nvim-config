@@ -76,10 +76,4 @@ opt.splitright = true
 vim.g.flutter_tools_log_level = "WARN"  -- Reduce log spam
 vim.g.flutter_show_log_on_run = "error"  -- Only show log on error
 
--- Dart fmt settings
-vim.g.dart_format_on_save = 1  -- Handled by conform.nvim atau LSP
-vim.g.dart_style_guide = 2  -- 2-space indent untuk Dart (Flutter standard)
-
--- Disable dart-vim-plugin built-in LSP kalau ada (conflict dengan flutter-tools)
-vim.g.dart_style_guide = 0
-vim.g.dart_format_on_save = 0
+-- dart-vim-plugin disabled (using flutter-tools.nvim + conform.nvim instead)
