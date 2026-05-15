@@ -44,6 +44,10 @@ return {
           enabled = true,
         },
         lsp = {
+          handlers = {
+            -- Disable old documentColor handler to prevent filter type error
+            ["textDocument/documentColor"] = false,
+          },
           on_attach = function(client, bufnr)
             -- NvChad on_attach integration
             local ok_nvchad, nvconfig = pcall(require, "nvchad.configs.lspconfig")
@@ -62,7 +66,7 @@ return {
             map("n", "<leader>Ft", "<cmd>Telescope flutter commands<cr>", { desc = "Flutter Commands", buffer = bufnr })
 
             -- Document Colors (Neovim 0.12+)
-            vim.lsp.document_color.enable(true, bufnr)
+            vim.lsp.document_color.enable(true, { bufnr = bufnr })
 
             -- Force Enable Code Action Provider
             client.server_capabilities.codeActionProvider = true
