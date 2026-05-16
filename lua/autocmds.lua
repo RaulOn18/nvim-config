@@ -78,19 +78,20 @@ autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 -- Auto-format Dart files BEFORE save (prevents 'file changed' error)
-autocmd("BufWritePre", {
-  group = flutter_group,
-  pattern = "*.dart",
-  callback = function(args)
-    -- Only format if file is modifiable and not readonly
-    if vim.bo[args.buf].modifiable and not vim.bo[args.buf].readonly then
-      local ok, conform = pcall(require, "conform")
-      if ok then
-        conform.format({ bufnr = args.buf, lsp_fallback = true, quiet = true })
-      end
-    end
-  end,
-})
+-- DISABLED: use <leader>fm manually when needed
+-- autocmd("BufWritePre", {
+--   group = flutter_group,
+--   pattern = "*.dart",
+--   callback = function(args)
+--     -- Only format if file is modifiable and not readonly
+--     if vim.bo[args.buf].modifiable and not vim.bo[args.buf].readonly then
+--       local ok, conform = pcall(require, "conform")
+--       if ok then
+--         conform.format({ bufnr = args.buf, lsp_fallback = true, quiet = true })
+--       end
+--     end
+--   end,
+-- })
 
 -- Set filetype untuk pubspec.yaml biar ada highlighting
 autocmd({ "BufRead", "BufNewFile" }, {
