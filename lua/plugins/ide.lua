@@ -77,6 +77,7 @@ return {
           { "<leader>gh", group = "hunks" },
           { "<leader>q", group = "quit/session" },
           { "<leader>s", group = "search" },
+          { "<leader>sr", group = "replace (grug-far)" },
           { "<leader>a", group = "AI (Augment)" },
           { "<leader>d", group = "Debug (DAP)" },
           { "<leader>h", group = "Git Hunks" },

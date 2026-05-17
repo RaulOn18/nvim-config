@@ -125,6 +125,27 @@ return {
     },
   },
 
+  -- Live grep and replace with ripgrep (async, non-blocking)
+  {
+    "MagicDuck/grug-far.nvim",
+    cmd = "GrugFar",
+    keys = {
+      { "<leader>sr", function() require("grug-far").open({ transient = true }) end, mode = { "n", "v" }, desc = "Search and Replace" },
+      { "<leader>sw", function() require("grug-far").open({ transient = true, prefills = { search = vim.fn.expand("<cword>") } }) end, mode = "n", desc = "Replace Word Under Cursor" },
+    },
+    opts = {
+      engine = "ripgrep",
+      transient = true,
+      startInInsertMode = true,
+      keymaps = {
+        replace = { n = "<localleader>r" },
+        qflist = { n = "<localleader>q" },
+        syncLocations = { n = "<localleader>s" },
+        close = { n = "<localleader>c" },
+      },
+    },
+  },
+
   -- Better quickfix & diagnostics list
   {
     "folke/trouble.nvim",
