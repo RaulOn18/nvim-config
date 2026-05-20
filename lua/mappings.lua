@@ -110,7 +110,17 @@ end, { desc = "Go to Declaration (or Definition)" })
 
 -- <leader>gd = Telescope picker (kalau ada multiple results)
 map("n", "<leader>gD", "<cmd>Telescope lsp_definitions<cr>", { desc = "Definition (Picker)" })
-map("n", "gr", "<cmd>Telescope lsp_references<cr>", { desc = "Find References" })
+
+-- gr = LSP References (Telescope, project-relative path)
+map("n", "gr", function()
+  require("telescope.builtin").lsp_references({
+    path_display = { "truncate" },
+    layout_config = {
+      preview_width = 0.5,
+    },
+  })
+end, { desc = "Find References" })
+
 map("n", "gI", "<cmd>Telescope lsp_implementations<cr>", { desc = "Go to Implementation" })
 map("n", "gy", vim.lsp.buf.type_definition, { desc = "Go to Type Definition" })
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
