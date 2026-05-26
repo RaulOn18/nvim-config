@@ -1,56 +1,48 @@
 -- Navigation and Search Plugins
 
 return {
-  -- File explorer - oil.nvim
+  -- File explorer - NvChad bawaan (nvim-tree)
   {
-    "stevearc/oil.nvim",
-    cmd = "Oil",
+    "nvim-tree/nvim-tree.lua",
+    cmd = { "NvimTreeToggle", "NvimTreeFocus" },
     keys = {
-      { "<C-n>", "<cmd>Oil<cr>", desc = "File Explorer" },
+      { "<C-n>", "<cmd>NvimTreeToggle<cr>", desc = "Toggle File Explorer" },
     },
-    opts = {
-      default_file_explorer = true,
-      columns = { "icon" },
-      view_options = {
-        show_hidden = true,
-      },
-      keymaps = {
-        -- Toggle close
-        ["<C-n>"] = "actions.close",
-        ["q"] = "actions.close",
-
-        -- Copy absolute path
-        ["yp"] = {
-          callback = function()
-            local entry = require("oil").get_cursor_entry()
-            local dir = require("oil").get_current_dir()
-            if entry and dir then
-              local path = dir .. entry.name
-              vim.fn.setreg("+", path)
-              vim.notify("Copied: " .. path)
-            end
-          end,
-          desc = "Copy file path",
-          mode = "n",
+    opts = function()
+      return {
+        filters = {
+          dotfiles = false,       -- tampilkan file hidden (dotfiles)
+          custom = {},
         },
-        -- Copy relative path
-        ["yP"] = {
-          callback = function()
-            local entry = require("oil").get_cursor_entry()
-            local dir = require("oil").get_current_dir()
-            if entry and dir then
-              local path = dir .. entry.name
-              local rel = vim.fn.fnamemodify(path, ":.")
-              vim.fn.setreg("+", rel)
-              vim.notify("Copied: " .. rel)
-            end
-          end,
-          desc = "Copy relative path",
-          mode = "n",
+        git = {
+          enable = true,
+          ignore = false,
         },
-      },
-    },
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+        view = {
+          width = 30,
+          side = "left",
+          preserve_window_proportions = true,
+        },
+        renderer = {
+          indent_width = 1,
+          icons = {
+            show = {
+              file = true,
+              folder = true,
+              folder_arrow = true,
+              git = true,
+            },
+          },
+        },
+        actions = {
+          open_file = {
+            window_picker = {
+              enable = true,
+            },
+          },
+        },
+      }
+    end,
   },
 
   -- Better grep with ripgrep integration
@@ -62,11 +54,22 @@ return {
     },
     opts = function(_, opts)
       local actions = require("telescope.actions")
+
+      -- Open file with path that handles parentheses (Next.js route groups)
+      local function open_file(prompt_bufnr)
+        local entry = require("telescope.actions.state").get_selected_entry()
+        actions.close(prompt_bufnr)
+        if entry and entry.path then
+          local path = entry.path:gsub("/", "\\")
+          path = path:gsub("%(", "\\%("):gsub("%)", "\\%)")
+          vim.cmd("edit " .. path)
+        end
+      end
       
       opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
         prompt_prefix = " ",
         selection_caret = "",
-        path_display = { "truncate" },
+        path_display = { "smart" },
         sorting_strategy = "ascending",
         layout_config = {
           horizontal = {
@@ -97,7 +100,7 @@ return {
             ["<C-j>"] = actions.move_selection_next,
             ["<C-k>"] = actions.move_selection_previous,
             ["<C-c>"] = actions.close,
-            ["<CR>"] = actions.select_default,
+            ["<CR>"] = open_file,
             ["<C-x>"] = actions.select_horizontal,
             ["<C-v>"] = actions.select_vertical,
             ["<C-t>"] = actions.select_tab,
@@ -108,7 +111,7 @@ return {
           },
           n = {
             ["q"] = actions.close,
-            ["<CR>"] = actions.select_default,
+            ["<CR>"] = open_file,
             ["<C-x>"] = actions.select_horizontal,
             ["<C-v>"] = actions.select_vertical,
             ["<C-t>"] = actions.select_tab,

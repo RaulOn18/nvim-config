@@ -54,17 +54,10 @@ map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })
 map("n", "<leader>fp", "<cmd>Telescope projects<cr>", { desc = "Find Projects" })
 map("n", "<leader>cd", function() require("utils.project").auto_cd_git_root() end, { desc = "CD to Git Root" })
 
--- File explorer (oil) - toggle: kalau oil kebuka, tutup. Kalau nggak, buka.
-local function oil_toggle()
-  if vim.bo.filetype == "oil" then
-    require("oil").close()
-  else
-    require("oil").open()
-  end
-end
-map("n", "<C-n>", oil_toggle, { desc = "Toggle File Explorer" })
-map("n", "<leader>e", oil_toggle, { desc = "Toggle File Explorer" })
-map("n", "<leader>E", "<cmd>Oil --float<cr>", { desc = "File Explorer (Float)" })
+-- File explorer (NvimTree) - toggle
+map("n", "<C-n>", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle File Explorer" })
+map("n", "<leader>e", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle File Explorer" })
+map("n", "<leader>E", "<cmd>NvimTreeFindFile<cr>", { desc = "Find File in Tree" })
 
 -- Telescope shortcuts
 map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
