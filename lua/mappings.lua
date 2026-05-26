@@ -54,8 +54,16 @@ map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })
 map("n", "<leader>fp", "<cmd>Telescope projects<cr>", { desc = "Find Projects" })
 map("n", "<leader>cd", function() require("utils.project").auto_cd_git_root() end, { desc = "CD to Git Root" })
 
--- Oil (file explorer)
-map("n", "<leader>e", "<cmd>Oil<cr>", { desc = "File Explorer (Oil)" })
+-- File explorer (oil) - toggle: kalau oil kebuka, tutup. Kalau nggak, buka.
+local function oil_toggle()
+  if vim.bo.filetype == "oil" then
+    require("oil").close()
+  else
+    require("oil").open()
+  end
+end
+map("n", "<C-n>", oil_toggle, { desc = "Toggle File Explorer" })
+map("n", "<leader>e", oil_toggle, { desc = "Toggle File Explorer" })
 map("n", "<leader>E", "<cmd>Oil --float<cr>", { desc = "File Explorer (Float)" })
 
 -- Telescope shortcuts

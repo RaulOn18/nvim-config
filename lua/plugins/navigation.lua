@@ -1,23 +1,53 @@
 -- Navigation and Search Plugins
 
 return {
-  -- Better file explorer - oil.nvim
+  -- File explorer - oil.nvim
   {
     "stevearc/oil.nvim",
     cmd = "Oil",
     keys = {
-      { "-", "<cmd>Oil<cr>", desc = "Open parent directory" },
+      { "<C-n>", "<cmd>Oil<cr>", desc = "File Explorer" },
     },
     opts = {
       default_file_explorer = true,
-      columns = {
-        "icon",
-        "permissions",
-        "size",
-        "mtime",
-      },
+      columns = { "icon" },
       view_options = {
         show_hidden = true,
+      },
+      keymaps = {
+        -- Toggle close
+        ["<C-n>"] = "actions.close",
+        ["q"] = "actions.close",
+
+        -- Copy absolute path
+        ["yp"] = {
+          callback = function()
+            local entry = require("oil").get_cursor_entry()
+            local dir = require("oil").get_current_dir()
+            if entry and dir then
+              local path = dir .. entry.name
+              vim.fn.setreg("+", path)
+              vim.notify("Copied: " .. path)
+            end
+          end,
+          desc = "Copy file path",
+          mode = "n",
+        },
+        -- Copy relative path
+        ["yP"] = {
+          callback = function()
+            local entry = require("oil").get_cursor_entry()
+            local dir = require("oil").get_current_dir()
+            if entry and dir then
+              local path = dir .. entry.name
+              local rel = vim.fn.fnamemodify(path, ":.")
+              vim.fn.setreg("+", rel)
+              vim.notify("Copied: " .. rel)
+            end
+          end,
+          desc = "Copy relative path",
+          mode = "n",
+        },
       },
     },
     dependencies = { "nvim-tree/nvim-web-devicons" },
