@@ -66,7 +66,10 @@ return {
             map("n", "<leader>Ft", "<cmd>Telescope flutter commands<cr>", { desc = "Flutter Commands", buffer = bufnr })
 
             -- Document Colors (Neovim 0.12+)
-            vim.lsp.document_color.enable(true, { bufnr = bufnr })
+            local ok_color, _ = pcall(vim.lsp.document_color.enable, true, { bufnr = bufnr })
+            if not ok_color then
+              vim.notify("document_color API not available", vim.log.levels.DEBUG)
+            end
 
             -- Force Enable Code Action Provider
             client.server_capabilities.codeActionProvider = true
@@ -105,8 +108,8 @@ return {
   -- Action Preview UI
   {
     "aznhe21/actions-preview.nvim",
-    keys = {
-      { "<leader>ca", function() require("actions-preview").code_actions() end, desc = "Code Action (Preview)", mode = { "n", "v" } },
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
     },
   },
 }
