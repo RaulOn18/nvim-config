@@ -71,8 +71,10 @@ return {
               vim.notify("document_color API not available", vim.log.levels.DEBUG)
             end
 
-            -- Force Enable Code Action Provider
-            client.server_capabilities.codeActionProvider = true
+            -- Force Enable Code Action Provider (ensure dart refactor actions show)
+            if type(client.server_capabilities.codeActionProvider) ~= "table" then
+              client.server_capabilities.codeActionProvider = {}
+            end
           end,
           settings = {
             showTodos = false,

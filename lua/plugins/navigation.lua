@@ -10,6 +10,10 @@ return {
     },
     opts = function()
       return {
+        update_focused_file = {
+          enable = true,
+          update_root = false,
+        },
         filters = {
           dotfiles = false,       -- tampilkan file hidden (dotfiles)
           custom = {},
