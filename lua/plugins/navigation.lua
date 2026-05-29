@@ -19,7 +19,7 @@ return {
           custom = {},
         },
         git = {
-          enable = true,
+          enable = false,  -- Disable for performance (slows down large repos)
           ignore = false,
         },
         view = {

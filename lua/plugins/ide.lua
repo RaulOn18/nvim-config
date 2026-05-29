@@ -4,7 +4,8 @@ return {
   -- Project management
   {
     "ahmedkhalf/project.nvim",
-    lazy = false,
+    lazy = true,
+    event = "VeryLazy",
     priority = 900,
     opts = {
       manual_mode = true,

@@ -41,6 +41,12 @@ return {
         "compiler",
         "bugreport",
         "ftplugin",
+        -- Additional performance plugins
+        "editorconfig",
+        "man",
+        "shada",
+        "spellfile",
+        "remote_plugins",
       },
     },
   },

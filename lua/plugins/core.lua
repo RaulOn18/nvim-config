@@ -12,9 +12,22 @@ return {
   -- LSP Config
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    lazy = false,
+    priority = 1000,
     config = function()
+      -- Suppress deprecation warning from old lspconfig
+      local orig = vim.notify
+      vim.notify = function(msg, level, opts)
+        if type(msg) == "string" and (msg:find("deprecated") or msg:find("lspconfig")) then
+          return
+        end
+        orig(msg, level, opts)
+      end
+      
+      -- Load our custom LSP config
       require "configs.lspconfig"
+      
+      vim.notify = orig
     end,
   },
 
@@ -34,41 +47,29 @@ return {
   -- Treesitter dengan optimizations
   {
     "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPre", "BufNewFile" },
+    event = { "BufReadPost", "BufNewFile" },
     build = ":TSUpdate",
-    opts = {
-      ensure_installed = {
+    config = function()
+      require("nvim-treesitter.config").setup {
+        install_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site'),
+      }
+
+      -- Ensure parsers are installed
+      local parsers = {
         "vim", "lua", "vimdoc",
         "html", "css", "tsx", "typescript",
         "javascript", "json", "markdown", "markdown_inline",
-      },
-      highlight = {
-        enable = true,
-        disable = function(lang, buf)
-          -- Disable untuk large files (>500KB) dan node_modules
-          local max_filesize = 500 * 1024 -- 500 KB
-          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-          if ok and stats and stats.size > max_filesize then
-            return true
-          end
-          -- Disable untuk node_modules
-          local bufname = vim.api.nvim_buf_get_name(buf)
-          if bufname:match("node_modules") then
-            return true
-          end
-        end,
-        additional_vim_regex_highlighting = false,
-      },
-      indent = { enable = true },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = "<C-space>",
-          node_incremental = "<C-space>",
-          scope_incremental = false,
-          node_decremental = "<bs>",
-        },
-      },
-    },
+        "dart", "go", "sql",
+      }
+
+      -- Install missing parsers
+      for _, parser in ipairs(parsers) do
+        if not pcall(vim.treesitter.language.inspect, parser) then
+          pcall(function()
+             require('nvim-treesitter.install').install(parser)
+          end)
+        end
+      end
+    end,
   },
 }

@@ -6,7 +6,7 @@
 local M = {}
 
 M.base46 = {
-  theme = "onedark",
+  theme = "gatekeeper",
   transparency = true,
   
   -- Better syntax highlighting

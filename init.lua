@@ -8,6 +8,17 @@ vim.g.maplocalleader = " "
 -- Disable shada (no session persistence)
 vim.opt.shadafile = "NONE"
 
+-- Performance: Disable unused built-in plugins
+-- vim.g.did_load_filetypes = 1  -- REMOVED: breaks filetype detection
+vim.g.did_load_fzf = 1
+vim.g.loaded_man = 1
+vim.g.loaded_remote_plugins = 1
+
+-- Performance: Disable swap/backup files
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.writebackup = false
+
 -- bootstrap lazy and all plugins
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 

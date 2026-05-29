@@ -9,18 +9,27 @@ o.updatetime = 250  -- Faster completion (default 4000ms too slow)
 o.timeoutlen = 500
 o.ttimeoutlen = 10
 
+-- Terminal rendering
+o.ttyfast = true
+
 -- Better completion experience
 opt.completeopt = "menuone,noinsert,noselect"
 o.pumheight = 10  -- Limit completion items
 
 -- Reduce CPU usage for large files
-o.lazyredraw = false
+o.lazyredraw = true  -- Don't redraw during macros (was false!)
 o.synmaxcol = 200
+o.redrawtime = 1000
+o.maxmempattern = 1000
 
 -- Memory optimizations
 opt.hidden = true
 opt.history = 100
 opt.undolevels = 100
+
+-- Completion optimization - don't scan included files/tags
+opt.complete:remove("i")
+opt.complete:remove("t")
 
 -- Disable providers yang tidak digunakan (speedup startup)
 vim.g.loaded_perl_provider = 0
