@@ -1,324 +1,477 @@
 ---
 name: neovim
-description: Comprehensive guide for this Neovim configuration - a modular, performance-optimized Lua-based IDE. Use when configuring plugins, adding keybindings, setting up LSP servers, debugging, or extending the configuration. Covers lazy.nvim, 82+ plugins across 9 categories, DAP debugging, AI integrations, and performance optimization.
+description: Comprehensive guide for this Neovim configuration - a modular, performance-optimized NvChad v2.5 based IDE. Use when configuring plugins, adding keybindings, setting up LSP servers, debugging, or extending the configuration. Covers lazy.nvim, NvChad UI framework, Flutter/Next.js/Go/SQL development, DAP debugging, AI integrations, and performance optimization.
 ---
 
 # Neovim Configuration Skill
 
-A comprehensive guide for working with this modular, performance-optimized Neovim configuration built on lazy.nvim.
+A NvChad v2.5 based configuration for Windows (PowerShell). Optimized for **Flutter/Dart**, **Next.js/TypeScript**, **Go**, and **SQL** development.
 
 ## Quick Reference
 
 | Metric | Value |
 |--------|-------|
+| Framework | NvChad v2.5 |
 | Plugin Manager | lazy.nvim |
-| Total Plugins | 82 |
-| Target Startup | <50ms |
-| Module Pattern | `M.setup()` |
 | Leader Key | `<Space>` |
+| Shell | `pwsh` (PowerShell) |
+| OS | Windows |
+| Theme | `ayu_dark` (transparent) |
 
-## Architecture Overview
+## Architecture
 
 ```
-~/.config/nvim/
-├── init.lua                  # Entry point
+~\AppData\Local\nvim\
+├── init.lua                    # Entry point: bootstrap lazy.nvim, load NvChad, options, autocmds, mappings
 ├── lua/
-│   ├── config/               # Core configuration (11 modules)
-│   │   ├── lazy.lua          # Plugin manager bootstrap
-│   │   ├── options.lua       # Vim options
-│   │   ├── keymaps.lua       # Key bindings
-│   │   ├── autocmds.lua      # Autocommands
-│   │   └── performance.lua   # Startup optimization
-│   ├── plugins/specs/        # Plugin specs (9 categories)
-│   │   ├── core.lua          # Foundation (plenary, nui, devicons)
-│   │   ├── ui.lua            # UI (lualine, bufferline, noice)
-│   │   ├── editor.lua        # Editor (autopairs, flash, harpoon)
-│   │   ├── lsp.lua           # LSP (lspconfig, mason, conform)
-│   │   ├── git.lua           # Git (fugitive, gitsigns, diffview)
-│   │   ├── ai.lua            # AI (copilot, ChatGPT)
-│   │   ├── debug.lua         # DAP (nvim-dap, dap-ui)
-│   │   ├── tools.lua         # Tools (telescope, neo-tree)
-│   │   └── treesitter.lua    # Syntax (treesitter, textobjects)
-│   ├── kickstart/            # Kickstart-derived modules
-│   └── utils/                # Utility functions
-└── lazy-lock.json            # Plugin version lock
+│   ├── chadrc.lua              # NvChad UI config (theme, statusline, cmp, terminal, telescope style)
+│   ├── options.lua             # Vim options (performance, tabs, folds, clipboard, split behavior)
+│   ├── mappings.lua            # All keybindings (NvChad defaults + custom)
+│   ├── autocmds.lua            # Autocommands (NodeJS, Flutter, SQL optimizations)
+│   ├── configs/
+│   │   ├── lazy.lua            # lazy.nvim settings + disabled builtins
+│   │   ├── lspconfig.lua       # LSP server configs (vim.lsp.start pattern, Neovim 0.12+)
+│   │   ├── conform.lua         # Formatter configs
+│   │   └── dap.lua             # DAP adapter configs (JS/TS, Go)
+│   ├── plugins/
+│   │   ├── init.lua            # Imports all plugin categories
+│   │   ├── core.lua            # LSP, conform, fidget, treesitter
+│   │   ├── git.lua             # gitsigns, neogit + diffview
+│   │   ├── navigation.lua      # nvim-tree, telescope, flash, grug-far, trouble
+│   │   ├── editing.lua         # mini.pairs, mini.surround, ts-comments
+│   │   ├── ide.lua             # project.nvim, which-key, indent-blankline, nvim-ufo
+│   │   ├── ai.lua              # augment.vim
+│   │   ├── debug.lua           # nvim-dap, dap-ui, dap-virtual-text
+│   │   ├── flutter.lua         # flutter-tools, nvim-lightbulb, actions-preview
+│   │   ├── markdown.lua        # render-markdown
+│   │   └── sql.lua             # vim-dadbod, dadbod-ui, dadbod-completion, sqlls
+│   └── utils/
+│       └── project.lua         # Git root detection, project picker
+└── lazy-lock.json              # Plugin version lock
 ```
 
-## Standard Module Pattern
+## NvChad v2.5 Specifics
 
-All configuration modules follow the `M.setup()` pattern:
+This config uses **NvChad v2.5** as base framework. Key differences from vanilla Neovim:
+
+- **`chadrc.lua`** — NvChad UI configuration (theme, statusline, cmp, telescope style)
+- **`nvchad.plugins`** — NvChad's built-in plugins imported in `init.lua`
+- **`require "nvchad.options"`** — NvChad default options loaded in `options.lua`
+- **`require "nvchad.mappings"`** — NvChad default keybindings loaded in `mappings.lua`
+- **`require "nvchad.autocmds"`** — NvChad default autocommands loaded in `autocmds.lua`
+- **`vim.g.base46_cache`** — NvChad theme cache directory
+- **NvChad UI components**: statusline, tabufline (buffer tabs), nvdash, cmp styling all configured via `chadrc.lua`
+
+### NvChad Built-in Features
+
+NvChad provides out of the box:
+- Statusline (`nvchad.statusline`)
+- Buffer tab bar (`nvchad.tabufline`)
+- Dashboard (`nvdash`)
+- Theme system (`base46`)
+- LSP defaults (`nvchad.configs.lspconfig`)
+- Completion defaults (`nvchad.configs.cmp`)
+
+### Extending NvChad
+
+Override NvChad defaults in `chadrc.lua`:
 
 ```lua
+-- lua/chadrc.lua
 local M = {}
 
-M.setup = function()
-  -- Configuration logic here
-end
+M.base46 = {
+  theme = "ayu_dark",
+  transparency = true,
+  hl_override = {
+    Comment = { italic = true },
+  },
+}
+
+M.ui = {
+  statusline = { ... },
+  telescope = { style = "bordered" },
+}
 
 return M
 ```
 
-## Plugin Management (lazy.nvim)
-
-### Adding a New Plugin
-
-Add to the appropriate category file in `lua/plugins/specs/`:
-
-```lua
--- lua/plugins/specs/tools.lua
-return {
-  -- Existing plugins...
-
-  {
-    "author/plugin-name",
-    event = "VeryLazy",           -- Loading strategy
-    dependencies = { "dep/name" }, -- Required plugins
-    opts = {
-      -- Plugin options
-    },
-    config = function(_, opts)
-      require("plugin-name").setup(opts)
-    end,
-  },
-}
-```
-
-### Loading Strategies
-
-| Strategy | When to Use | Example |
-|----------|-------------|---------|
-| `lazy = true` | Default, load on demand | Most plugins |
-| `event = "VeryLazy"` | After UI loads | UI enhancements |
-| `event = "BufReadPre"` | When opening files | Treesitter, gitsigns |
-| `event = "InsertEnter"` | When typing | Completion, autopairs |
-| `cmd = "CommandName"` | On command invocation | Heavy tools |
-| `ft = "filetype"` | For specific filetypes | Language plugins |
-| `keys = {...}` | On keypress | Motion plugins |
-
-### Plugin Commands
-
-| Command | Description |
-|---------|-------------|
-| `:Lazy` | Open lazy.nvim dashboard |
-| `:Lazy sync` | Update and install plugins |
-| `:Lazy profile` | Show startup time analysis |
-| `:Lazy clean` | Remove unused plugins |
-| `:Lazy health` | Check plugin health |
-
-## LSP Configuration
-
-See [references/lsp.md](references/lsp.md) for complete LSP reference.
-
-### LSP Stack
-
-```
-mason.nvim (installer)
-    ├── mason-lspconfig.nvim → nvim-lspconfig
-    ├── mason-tool-installer.nvim (auto-install)
-    └── mason-nvim-dap.nvim → nvim-dap
-
-nvim-lspconfig
-    ├── blink.cmp (completion)
-    ├── conform.nvim (formatting)
-    ├── nvim-lint (linting)
-    └── trouble.nvim (diagnostics)
-```
-
-### Adding an LSP Server
-
-```lua
--- In lua/plugins/specs/lsp.lua, add to mason-tool-installer list:
-ensure_installed = {
-  "lua_ls",
-  "pyright",
-  "your_new_server",  -- Add here
-}
-
--- Configure in lspconfig setup:
-servers = {
-  your_new_server = {
-    settings = {
-      -- Server-specific settings
-    },
-  },
-}
-```
-
-### LSP Keybindings
-
-| Key | Action |
-|-----|--------|
-| `gd` | Go to definition |
-| `gr` | Go to references |
-| `gI` | Go to implementation |
-| `gD` | Go to declaration |
-| `K` | Hover documentation |
-| `<leader>rn` | Rename symbol |
-| `<leader>ca` | Code action |
-| `<leader>D` | Type definition |
-| `<leader>ds` | Document symbols |
-| `<leader>ws` | Workspace symbols |
-
 ## Keybindings
 
-See [references/keybindings.md](references/keybindings.md) for complete reference.
-
-### Core Navigation
+### Core Navigation (mappings.lua)
 
 | Key | Action |
 |-----|--------|
 | `<C-h/j/k/l>` | Window navigation |
+| `<C-Up/Down/Left/Right>` | Resize windows |
 | `<S-h>` / `<S-l>` | Previous/next buffer |
-| `<leader>sf` | Search files |
-| `<leader>sg` | Search by grep |
-| `<leader><space>` | Search buffers |
-| `\\` | Toggle Neo-tree |
+| `;` | Enter command mode (`:`) |
+| `jk` | Exit insert mode |
+| `<C-s>` | Save file (all modes) |
+| `<Esc>` | Clear search highlights |
 
-### Adding Keybindings
-
-```lua
--- In lua/config/keymaps.lua M.setup():
-vim.keymap.set('n', '<leader>xx', function()
-  -- Your action
-end, { desc = 'Description for which-key' })
-
--- Or in a plugin spec:
-keys = {
-  { "<leader>xx", "<cmd>Command<CR>", desc = "Description" },
-}
-```
-
-## Debugging (DAP)
-
-See [references/debugging.md](references/debugging.md) for complete reference.
-
-### DAP Keybindings
+### File Explorer & Telescope
 
 | Key | Action |
 |-----|--------|
-| `<F5>` | Continue/Start debugging |
-| `<F10>` | Step over |
-| `<F11>` | Step into |
-| `<F12>` | Step out |
-| `<leader>b` | Toggle breakpoint |
-| `<leader>B` | Conditional breakpoint |
+| `<C-n>` / `<leader>e` | Toggle NvimTree |
+| `<leader>E` | Find file in tree |
+| `<leader>ff` | Find files |
+| `<leader>fg` | Live grep |
+| `<leader>fb` | Find buffers |
+| `<leader>fh` | Help tags |
+| `<leader>fo` | Recent files |
+| `<leader>fc` | Grep string under cursor |
+| `<leader>fr` | Resume last search |
+| `<leader>fk` | Find keymaps |
+| `<leader>fC` | Find commands |
+| `<leader>fp` | Find projects |
 
-### Adding a Debug Adapter
+### Git
+
+| Key | Action |
+|-----|--------|
+| `<leader>gg` | Open Neogit |
+| `<leader>gd` | Diffview open |
+| `<leader>gD` | Diffview close |
+| `<leader>gh` | File history |
+| `<leader>gb` | Git branches |
+| `<leader>gc` | Git commits |
+| `<leader>gs` | Git status |
+| `<leader>hs/hr` | Stage/reset hunk |
+| `<leader>hp` | Preview hunk |
+| `<leader>hb` | Blame line |
+| `<leader>tbl` | Toggle line blame |
+| `]c` / `[c` | Next/prev hunk |
+
+### LSP
+
+| Key | Action |
+|-----|--------|
+| `gd` | Go to definition (native jump) |
+| `gD` | Go to declaration (fallback to definition) |
+| `<leader>gD` | Definition picker (Telescope) |
+| `gr` | Find references (Telescope) |
+| `gI` | Go to implementation |
+| `gy` | Type definition |
+| `<leader>ca` | Code action |
+| `<leader>cr` | Rename symbol |
+| `<leader>cd` | Line diagnostics |
+| `<leader>cl` | LSP Info |
+| `[d` / `]d` | Prev/next diagnostic |
+
+### Search & Replace
+
+| Key | Action |
+|-----|--------|
+| `<leader>sr` | Search and replace (grug-far) |
+| `<leader>sw` | Replace word under cursor |
+| `gs` | Flash jump |
+| `S` | Flash treesitter |
+
+### Diagnostics (Trouble)
+
+| Key | Action |
+|-----|--------|
+| `<leader>dd` | All diagnostics |
+| `<leader>db` | Buffer diagnostics |
+| `<leader>ds` | Symbols |
+
+### Buffer & Quit
+
+| Key | Action |
+|-----|--------|
+| `<leader>bd` | Close buffer |
+| `<leader>bo` | Close other buffers |
+| `<leader>qq` | Quit all |
+| `<leader>qQ` | Force quit all |
+
+### DAP Debugging
+
+| Key | Action |
+|-----|--------|
+| `<leader>dc` | Continue/Start |
+| `<leader>db` | Toggle breakpoint |
+| `<leader>dB` | Conditional breakpoint |
+| `<leader>di` | Step into |
+| `<leader>dO` | Step over |
+| `<leader>do` | Step out |
+| `<leader>du` | Toggle DAP UI |
+| `<leader>dr` | Toggle REPL |
+| `<leader>dt` | Terminate |
+
+### Flutter (only in Dart files)
+
+| Key | Action |
+|-----|--------|
+| `<leader>Fr` | Flutter run |
+| `<leader>FR` | Flutter restart |
+| `<leader>Fq` | Flutter quit |
+| `<leader>Fc` | Hot reload |
+| `<leader>Ft` | Flutter commands (Telescope) |
+| `<leader>fe` | Extract widget/method |
+| `<leader>fx` | Quick fix |
+
+### SQL
+
+| Key | Action |
+|-----|--------|
+| `<leader>Du` | Toggle DB UI |
+| `<leader>Df` | Find DB buffer |
+| `<leader>Dr` | Rename DB buffer |
+| `<leader>Dq` | Last query info |
+
+### AI (Augment)
+
+| Key | Action |
+|-----|--------|
+| `<leader>ac` | Augment chat |
+| `<leader>an` | New chat |
+| `<leader>at` | Toggle chat |
+| `<leader>as` | Status |
+| `<leader>al` | List chats |
+
+### Formatting
+
+| Key | Action |
+|-----|--------|
+| `<leader>cf` | Format selection |
+| `<leader>cF` | Format file |
+| `<leader>cd` | Line diagnostics float |
+
+### Projects
+
+| Key | Action |
+|-----|--------|
+| `<leader>fp` | Find projects (Telescope) |
+| `<leader>cd` | CD to git root |
+
+## LSP Configuration
+
+Uses **custom `vim.lsp.start()` pattern** (Neovim 0.12+), NOT the old `lspconfig[server].setup()` pattern.
+
+### Config File: `lua/configs/lspconfig.lua`
+
+Pattern:
 
 ```lua
--- In lua/plugins/specs/debug.lua
-local dap = require("dap")
+local M = {}
 
-dap.adapters.your_adapter = {
-  type = "executable",
-  command = "path/to/adapter",
-}
-
-dap.configurations.your_filetype = {
-  {
-    type = "your_adapter",
-    request = "launch",
-    name = "Launch",
-    program = "${file}",
-  },
-}
-```
-
-## Performance Optimization
-
-### Startup Optimization Layers
-
-| Layer | Technique | Savings |
-|-------|-----------|---------|
-| 1 | `vim.loader.enable()` | ~50ms |
-| 2 | Skip `vim._defaults` | ~180ms |
-| 3 | Disable providers | ~10ms |
-| 4 | Disable builtins | ~20ms |
-| 5 | Deferred config | ~30ms |
-| 6 | Event-based loading | Variable |
-
-### Profiling Startup
-
-```vim
-:Lazy profile
-```
-
-### Deferred Loading Pattern
-
-```lua
--- In init.lua
-vim.defer_fn(function()
-  require('config.options').setup()
-  require('config.keymaps').setup()
-  require('config.autocmds').setup()
-end, 0)
-```
-
-## Common Tasks
-
-### Adding an Autocommand
-
-```lua
--- In lua/config/autocmds.lua M.setup():
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "markdown", "text" },
-  callback = function()
-    vim.opt_local.wrap = true
-    vim.opt_local.spell = true
+M.setup_lsp("server_name", {
+  cmd = { "server", "--stdio" },
+  filetypes = { "filetype1", "filetype2" },
+  settings = { ... },
+  on_attach = function(client, bufnr)
+    client.server_capabilities.documentFormattingProvider = false
   end,
+})
+
+-- Diagnostic config at bottom
+vim.diagnostic.config { ... }
+
+return M
+```
+
+### Configured LSP Servers
+
+| Server | Filetypes |
+|--------|----------|
+| `vtsls` | javascript, javascriptreact, typescript, typescriptreact |
+| `eslint` | javascript, javascriptreact, typescript, typescriptreact, vue, svelte |
+| `tailwindcss` | html, css, scss, javascript, javascriptreact, typescript, typescriptreact |
+| `html` | html |
+| `cssls` | css, scss, less |
+| `gopls` | go, gomod, gowork, gotmpl |
+| `sqlls` | sql, mysql |
+| `dartls` | dart (via flutter-tools.nvim, NOT in lspconfig.lua) |
+
+### Adding a New LSP Server
+
+In `lua/configs/lspconfig.lua`:
+
+```lua
+M.setup_lsp("server_name", {
+  cmd = { "server", "--stdio" },
+  filetypes = { "your_filetype" },
+  settings = {
+    -- Server settings
+  },
 })
 ```
 
-### Adding Vim Options
+Mason auto-install is NOT configured. Install servers manually via `:Mason` or system package manager.
+
+## Formatter Configuration
+
+### Config File: `lua/configs/conform.lua`
+
+| Filetype | Formatter |
+|----------|-----------|
+| lua | stylua |
+| css, html | prettier |
+| javascript, typescript, jsx, tsx | prettier |
+| json, jsonc | prettier |
+| markdown | prettier |
+| dart | dart_format (`dart format`) |
+
+**Format on save: DISABLED.** Use `<leader>cf` (selection) or `<leader>cF` (file) manually.
+
+### Adding a Formatter
 
 ```lua
--- In lua/config/options.lua M.setup():
-vim.opt.your_option = value
-```
-
-### Creating a Utility Function
-
-```lua
--- In lua/utils/init.lua
-local M = {}
-
-M.your_function = function(args)
-  -- Implementation
-end
-
-return M
-
--- Usage: require('utils').your_function(args)
+-- In lua/configs/conform.lua
+formatters_by_ft = {
+  your_filetype = { "formatter_name" },
+},
+formatters = {
+  formatter_name = {
+    command = "formatter_cmd",
+    args = { "--flag", "$FILENAME" },
+  },
+},
 ```
 
 ## Plugin Categories
 
-### Core (4 plugins)
-`plenary.nvim`, `nui.nvim`, `nvim-web-devicons`, `lazy.nvim`
+### Core (4 plugins) — `plugins/core.lua`
+- `stevearc/conform.nvim` — Formatting
+- `neovim/nvim-lspconfig` — LSP (lazy=false, priority=1000)
+- `j-hui/fidget.nvim` — LSP progress (on LspAttach)
+- `nvim-treesitter/nvim-treesitter` — Syntax (vim, lua, vimdoc, html, css, tsx, typescript, javascript, json, markdown, dart, go, sql)
 
-### UI (11 plugins)
-`tokyonight`, `alpha-nvim`, `lualine`, `bufferline`, `noice`, `nvim-notify`, `which-key`, `indent-blankline`, `mini.indentscope`, `fidget`, `nvim-scrollbar`
+### Git (2 plugins) — `plugins/git.lua`
+- `lewis6991/gitsigns.nvim` — Git signs + hunk actions
+- `NeogitOrg/neogit` — Git UI (with diffview + telescope integration)
 
-### Editor (13 plugins)
-`nvim-autopairs`, `flash.nvim`, `clever-f`, `nvim-spectre`, `grug-far`, `harpoon`, `persistence`, `smartyank`, `vim-sleuth`, `vim-illuminate`, `tabular`, `todo-comments`, `toggleterm`
+### Navigation (5 plugins) — `plugins/navigation.lua`
+- `nvim-tree/nvim-tree.lua` — File explorer (cmd/keys loaded)
+- `nvim-telescope/telescope.nvim` — Fuzzy finder (with fzf-native, ui-select)
+- `folke/flash.nvim` — Fast navigation
+- `MagicDuck/grug-far.nvim` — Async search & replace
+- `folke/trouble.nvim` — Diagnostics list
 
-### LSP (12 plugins)
-`nvim-lspconfig`, `mason`, `mason-lspconfig`, `mason-tool-installer`, `lazydev`, `luvit-meta`, `SchemaStore`, `conform`, `nvim-lint`, `trouble`, `blink.cmp`/`nvim-cmp`, `LuaSnip`
+### Editing (3 plugins) — `plugins/editing.lua`
+- `echasnovski/mini.pairs` — Auto brackets
+- `echasnovski/mini.surround` — Surround (gsa/gsd/gsf/gsr/gsh)
+- `folke/ts-comments.nvim` — Better comments
 
-### Git (7 plugins)
-`vim-fugitive`, `vim-rhubarb`, `gitsigns`, `diffview`, `vim-flog`, `git-conflict`, `octo`
+### IDE (4 plugins) — `plugins/ide.lua`
+- `ahmedkhalf/project.nvim` — Project management (pattern detection: .git, package.json, etc.)
+- `folke/which-key.nvim` — Keybinding discoverability
+- `lukas-reineke/indent-blankline.nvim` — Indent guides
+- `kevinhwang91/nvim-ufo` — Code folding (treesitter + indent)
 
-### AI (3 plugins)
-`copilot.vim`, `ChatGPT.nvim`, `mcphub.nvim`
+### AI (1 plugin) — `plugins/ai.lua`
+- `augmentcode/augment.vim` — AI assistant (cmd/keys loaded)
 
-### Debug (8 plugins)
-`nvim-dap`, `nvim-dap-ui`, `nvim-dap-virtual-text`, `nvim-dap-python`, `nvim-dap-go`, `mason-nvim-dap`, `telescope-dap`, `nvim-nio`
+### Debug (3 plugins) — `plugins/debug.lua`
+- `mfussenegger/nvim-dap` — DAP core (JS/TS via node2/pwa-node, Go via delve)
+- `rcarriga/nvim-dap-ui` — Debug UI (auto open/close on session)
+- `theHamsta/nvim-dap-virtual-text` — Inline debug values
 
-### Tools (14 plugins)
-`telescope`, `telescope-fzf-native`, `telescope-ui-select`, `neo-tree`, `oil.nvim`, `nvim-bqf`, `rest.nvim`, `vim-dadbod`, `vim-dadbod-ui`, `vim-dadbod-completion`, `iron.nvim`, `markdown-preview`, `nvim-puppeteer`, `obsidian.nvim`
+### Flutter (3 plugins) — `plugins/flutter.lua`
+- `nvim-flutter/flutter-tools.nvim` — Flutter IDE (ft=dart, with widget guides, closing tags, debugger)
+- `kosayoda/nvim-lightbulb` — Code action lightbulb
+- `aznhe21/actions-preview.nvim` — Code action preview UI
 
-### Treesitter (3 plugins)
-`nvim-treesitter`, `nvim-treesitter-context`, `nvim-treesitter-textobjects`
+### Markdown (1 plugin) — `plugins/markdown.lua`
+- `MeanderingProgrammer/render-markdown.nvim` — Markdown rendering (ft=markdown)
+
+### SQL (4 plugins) — `plugins/sql.lua`
+- `tpope/vim-dadbod` — Database client
+- `kristijanhusak/vim-dadbod-ui` — DB UI
+- `kristijanhusak/vim-dadbod-completion` — SQL completion
+- sqlls configured via lspconfig
+
+## Performance Optimizations
+
+### In `options.lua`
+
+- `updatetime = 250` (faster CursorHold events)
+- `lazyredraw = true` (skip redraw during macros)
+- `synmaxcol = 200` (limit syntax highlighting columns)
+- Disabled providers: perl, ruby, node
+- `completeopt` optimized for completion
+- Reduced undo/swap/backup overhead
+
+### In `lua/configs/lazy.lua`
+
+Disabled built-in plugins: netrw, matchit, tar/zip plugins, tutor, rplugin, syntax, ftplugin, etc.
+
+### In `autocmds.lua`
+
+- `node_modules/` — readonly, not buflisted
+- Large files (>1MB) — syntax off, foldmethod manual
+- `vtsls` — semantic tokens disabled
+- Flutter build/cache dirs — readonly, syntax off
+- Large Dart files (>500KB) — syntax off
+
+### Treesitter Parsers
+
+Installed: vim, lua, vimdoc, html, css, tsx, typescript, javascript, json, markdown, markdown_inline, dart, go, sql
+
+### In `init.lua`
+
+- `vim.opt.shadafile = "NONE"` — No session persistence
+- Disabled builtins: fzf, man, remote_plugins
+- Shell: `pwsh`
+
+## Common Tasks
+
+### Adding a Plugin
+
+Add to appropriate file in `lua/plugins/`:
+
+```lua
+-- lua/plugins/ide.lua (or create new category file)
+return {
+  {
+    "author/plugin-name",
+    event = "VeryLazy",  -- or cmd, keys, ft
+    opts = { ... },
+    dependencies = { "dep/name" },
+  },
+}
+
+-- If new file, add import to lua/plugins/init.lua:
+{ import = "plugins.your_category" },
+```
+
+### Adding Keybindings
+
+In `lua/mappings.lua`:
+
+```lua
+map("n", "<leader>xx", "<cmd>Command<cr>", { desc = "Description" })
+```
+
+Or in plugin spec `keys = { ... }`.
+
+### Adding an Autocommand
+
+In `lua/autocmds.lua`:
+
+```lua
+local group = augroup("GroupName", { clear = true })
+autocmd("EventName", {
+  group = group,
+  pattern = "*.ext",
+  callback = function(args) ... end,
+})
+```
+
+## Split Management
+
+| Key | Action |
+|-----|--------|
+| `<C-w>v` | Vertical split |
+| `<C-w>s` | Horizontal split |
+| `<C-w>c` | Close split |
+| `<C-w>o` | Close all other splits |
+| `<C-h/j/k/l>` | Navigate splits |
+| `<C-Up/Down/Left/Right>` | Resize splits |
+
+Telescope: `<C-x>` horizontal split, `<C-v>` vertical split, `<C-t>` new tab.
 
 ## Troubleshooting
 
@@ -330,47 +483,20 @@ return M
 | Slow startup | `:Lazy profile` |
 | Treesitter errors | `:TSUpdate` |
 | Keybinding conflicts | `:verbose map <key>` |
-
-### Health Check
-
-```vim
-:checkhealth
-```
-
-### Debug Logging
-
-```lua
--- Temporarily add to plugin config:
-log_level = vim.log.levels.DEBUG,
-```
-
-## Resources
-
-- [lazy.nvim](https://github.com/folke/lazy.nvim)
-- [Mason.nvim](https://github.com/williamboman/mason.nvim)
-- [Neovim Documentation](https://neovim.io/doc/)
-- [Kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
-
-## References
-
-- [references/configuration.md](references/configuration.md) - Core configuration options
-- [references/plugins.md](references/plugins.md) - All 82 plugins detailed
-- [references/plugin-deepdives.md](references/plugin-deepdives.md) - In-depth plugin guides
-- [references/lsp.md](references/lsp.md) - LSP server configuration
-- [references/keybindings.md](references/keybindings.md) - Complete keybinding reference
-- [references/debugging.md](references/debugging.md) - DAP debugging guide
-- [references/performance.md](references/performance.md) - Optimization techniques
-- [references/tools.md](references/tools.md) - CLI tools, utilities, and workflows
-- [references/troubleshooting.md](references/troubleshooting.md) - Common issues and solutions
-- [references/migration-0.11.md](references/migration-0.11.md) - Neovim 0.11 migration guide
-
----
+| NvChad UI broken | Check `chadrc.lua` structure matches [nvconfig.lua](https://github.com/NvChad/ui/blob/v3.0/lua/nvconfig.lua) |
+| LSP deprecation warning | Normal — config suppresses it via notify override |
+| Flutter tools not loading | Check `pubspec.yaml` exists in project root |
 
 ## Gotchas
 
-- **LSP attaches on FileType, not BufRead:** Buffers opened before plugin spec evaluation get no LSP. `:LspInfo` shows nothing — open a new buffer of the same filetype or `:edit` to retrigger the autocommand.
-- **`lazy-lock.json` silently pins everything:** `:Lazy sync` will not update plugins unless the lock entry is removed or `:Lazy update` is run explicitly. Sync only installs missing plugins and removes orphans.
-- **`vim.defer_fn(..., 0)` runs after UIEnter but before FileType:** Config loaded this way misses the first buffer's filetype event. Move keymaps and options out of `defer_fn` if first-buffer integrations break.
-- **Mason installs to `~/.local/share/nvim/mason/bin/`, not `$PATH`:** External tools that invoke formatters or linters from the shell will not find Mason-installed binaries unless you prepend that path explicitly.
-- **`event = "VeryLazy"` defers until after UI is ready:** Plugins that intercept startup behavior (sessions, dashboards, colorschemes) must use `lazy = false` with `priority = 1000` — VeryLazy is too late.
-- **Treesitter parsers compile against the installed Neovim ABI:** After a Neovim upgrade, `:TSUpdate` is mandatory or you will see "Impossible pattern" errors with no obvious cause.
+- **NvChad v2.5 specific:** `chadrc.lua` structure must match `nvconfig.lua` from NvChad UI repo. Wrong keys = silent failure.
+- **`vim.lsp.start()` pattern:** This config does NOT use `lspconfig[server].setup()`. Uses custom `M.setup_lsp()` that registers FileType autocmds. Add servers in `configs/lspconfig.lua`, not in plugin specs.
+- **Flutter LSP:** Dart LSP is managed by `flutter-tools.nvim`, NOT by `configs/lspconfig.lua`. Flutter tools check for `pubspec.yaml` before activating.
+- **Format on save DISABLED:** Must use `<leader>cf`/`<leader>cF` manually. Conform ignores format_on_save for JS/TS/Lua/Dart.
+- **Mason NOT auto-installing:** Servers must be installed manually. No `ensure_installed` list.
+- **`lazy-lock.json` silently pins everything:** `:Lazy sync` only installs missing. `:Lazy update` needed for updates.
+- **Treesitter ABI:** After Neovim upgrade, `:TSUpdate` mandatory.
+- **Windows paths:** Config uses Windows path conventions. `pwsh` as shell.
+- **`shadafile = "NONE"`:** No session persistence. Cursor positions, marks, registers not saved between sessions.
+- **project.nvim `manual_mode = true`:** Does NOT auto-change directory. Use `<leader>cd` to cd to git root manually, or `<leader>fp` to pick project.
+- **`node_provider` disabled:** Node.js provider disabled for performance. If you need Node plugins, re-enable in `options.lua`.
