@@ -1,14 +1,19 @@
 -- Project management configuration
 local M = {}
 
--- Find git root
+-- Find git root (walks up to parent repo if inside submodule)
 M.find_git_root = function()
   local path = vim.fn.expand("%:p:h")
-  local git_root = vim.fn.systemlist("git -C " .. path .. " rev-parse --show-toplevel")[1]
-  if vim.v.shell_error == 0 then
-    return git_root
+  local toplevel = vim.fn.systemlist("git -C " .. path .. " rev-parse --show-toplevel")[1]
+  if vim.v.shell_error ~= 0 or not toplevel then
+    return nil
   end
-  return nil
+  -- If inside submodule, --show-superproject-working-tree returns the parent repo
+  local super = vim.fn.systemlist("git -C " .. path .. " rev-parse --show-superproject-working-tree")
+  if super and super[1] and super[1] ~= "" then
+    return super[1]
+  end
+  return toplevel
 end
 
 -- Telescope projects picker
