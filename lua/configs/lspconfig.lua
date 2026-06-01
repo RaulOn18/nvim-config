@@ -6,6 +6,27 @@ local M = {}
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+-- Suppress ESLint -32603 errors globally (Windows path handling bug)
+local orig_publish = vim.lsp.handlers["textDocument/publishDiagnostics"]
+vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+  if err and err.code == -32603 then
+    return
+  end
+  if orig_publish then
+    return orig_publish(err, result, ctx, config)
+  end
+end
+
+local orig_diagnostic = vim.lsp.handlers["textDocument/diagnostic"]
+vim.lsp.handlers["textDocument/diagnostic"] = function(err, result, ctx, config)
+  if err and err.code == -32603 then
+    return
+  end
+  if orig_diagnostic then
+    return orig_diagnostic(err, result, ctx, config)
+  end
+end
+
 function M.setup_lsp(name, config)
   config.name = name
   config.capabilities = capabilities
@@ -57,8 +78,38 @@ function M.setup_lsp(name, config)
           end
         end
 
+        -- Get buffer path for root_dir calculation
+        local fname = vim.api.nvim_buf_get_name(buf)
+        if fname == "" then
+          -- No file path yet (new buffer), skip LSP start
+          return
+        end
+
+        -- Resolve root_dir if it's a function
+        local lsp_config = vim.deepcopy(config)
+        if type(lsp_config.root_dir) == "function" then
+          local root = lsp_config.root_dir(fname)
+          if not root or root == "" then
+            -- No root found, skip to avoid undefined path errors
+            return
+          end
+          lsp_config.root_dir = root
+        end
+
+        -- Ensure root_dir is a valid string path
+        if lsp_config.root_dir and type(lsp_config.root_dir) == "string" then
+          -- Convert to URI for vim.lsp.start()
+          lsp_config.root_uri = vim.uri_from_fname(lsp_config.root_dir)
+          lsp_config.workspace_folders = {
+            {
+              uri = lsp_config.root_uri,
+              name = vim.fn.fnamemodify(lsp_config.root_dir, ":t"),
+            },
+          }
+        end
+
         -- Start LSP client
-        local client_id = vim.lsp.start(config)
+        local client_id = vim.lsp.start(lsp_config)
         if client_id then
           vim.lsp.buf_attach_client(buf, client_id)
         end
@@ -117,11 +168,37 @@ M.setup_lsp("vtsls", {
 M.setup_lsp("eslint", {
   cmd = { "vscode-eslint-language-server", "--stdio" },
   filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
+  root_dir = function(fname)
+    local util = require "lspconfig.util"
+    return util.root_pattern(
+      ".eslintrc",
+      ".eslintrc.js",
+      ".eslintrc.cjs",
+      ".eslintrc.yaml",
+      ".eslintrc.yml",
+      ".eslintrc.json",
+      "eslint.config.js",
+      "eslint.config.mjs",
+      "eslint.config.cjs",
+      "package.json"
+    )(fname)
+  end,
+  single_file_support = false,
   settings = {
     eslint = {
       quiet = true,
       validate = "probe",
+      workingDirectory = { mode = "auto" },
+      -- Disable problematic diagnostics that trigger path errors
+      problems = { shortenToSingleLine = false },
+      codeAction = {
+        disableRuleComment = { enable = true, location = "separateLine" },
+        showDocumentation = { enable = false },
+      },
     },
+  },
+  handlers = {
+    ["eslint/probeFailed"] = function() return nil end,
   },
   on_attach = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = true
