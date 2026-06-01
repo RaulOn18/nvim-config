@@ -6,8 +6,8 @@
 local M = {}
 
 M.base46 = {
-  theme = "ayu_dark",
-  transparency = true,
+  theme = "solarized_dark",
+  transparency = false,
   
   -- Better syntax highlighting
   hl_override = {
