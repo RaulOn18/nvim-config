@@ -209,6 +209,7 @@ M.setup_lsp("eslint", {
 M.setup_lsp("tailwindcss", {
   cmd = { "tailwindcss-language-server", "--stdio" },
   filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  single_file_support = false,
   settings = {
     tailwindCSS = {
       includeLanguages = {
