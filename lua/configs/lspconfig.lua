@@ -209,6 +209,21 @@ M.setup_lsp("eslint", {
 M.setup_lsp("tailwindcss", {
   cmd = { "tailwindcss-language-server", "--stdio" },
   filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  root_dir = function(fname)
+    local util = require "lspconfig.util"
+    return util.root_pattern(
+      "tailwind.config.js",
+      "tailwind.config.cjs",
+      "tailwind.config.mjs",
+      "tailwind.config.ts",
+      "postcss.config.js",
+      "postcss.config.cjs",
+      "postcss.config.mjs",
+      "postcss.config.ts",
+      "package.json",
+      "tailwind.config.lua"
+    )(fname)
+  end,
   single_file_support = false,
   settings = {
     tailwindCSS = {
