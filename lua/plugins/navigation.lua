@@ -1,52 +1,47 @@
 -- Navigation and Search Plugins
 
 return {
-  -- File explorer - NvChad bawaan (nvim-tree)
+  -- File explorer: NvChad loads nvim-tree on cmd trigger
+  -- Custom opts go in nvim-tree opts override below
   {
     "nvim-tree/nvim-tree.lua",
-    cmd = { "NvimTreeToggle", "NvimTreeFocus" },
-    keys = {
-      { "<C-n>", "<cmd>NvimTreeToggle<cr>", desc = "Toggle File Explorer" },
+    opts = {
+      update_focused_file = {
+        enable = true,
+        update_root = false,
+      },
+      filters = {
+        dotfiles = false,
+        custom = {},
+      },
+      git = {
+        enable = false,
+        ignore = false,
+      },
+      view = {
+        width = 30,
+        side = "left",
+        preserve_window_proportions = true,
+      },
+      renderer = {
+        indent_width = 1,
+        icons = {
+          show = {
+            file = true,
+            folder = true,
+            folder_arrow = true,
+            git = true,
+          },
+        },
+      },
+      actions = {
+        open_file = {
+          window_picker = {
+            enable = true,
+          },
+        },
+      },
     },
-    opts = function()
-      return {
-        update_focused_file = {
-          enable = true,
-          update_root = false,
-        },
-        filters = {
-          dotfiles = false,       -- tampilkan file hidden (dotfiles)
-          custom = {},
-        },
-        git = {
-          enable = false,  -- Disable for performance (slows down large repos)
-          ignore = false,
-        },
-        view = {
-          width = 30,
-          side = "left",
-          preserve_window_proportions = true,
-        },
-        renderer = {
-          indent_width = 1,
-          icons = {
-            show = {
-              file = true,
-              folder = true,
-              folder_arrow = true,
-              git = true,
-            },
-          },
-        },
-        actions = {
-          open_file = {
-            window_picker = {
-              enable = true,
-            },
-          },
-        },
-      }
-    end,
   },
 
   -- Better grep with ripgrep integration

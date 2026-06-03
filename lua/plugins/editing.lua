@@ -1,12 +1,8 @@
 -- Editing Enhancement Plugins
 
 return {
-  -- Better matching pairs
-  {
-    "echasnovski/mini.pairs",
-    event = "VeryLazy",
-    opts = {},
-  },
+  -- Better matching pairs (NvChad loads nvim-autopairs with cmp integration)
+  -- No need for mini.pairs
 
   -- Better surround
   {

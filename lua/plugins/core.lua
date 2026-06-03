@@ -45,6 +45,26 @@ return {
     },
   },
 
+  -- CMP performance override (NvChad loads nvim-cmp on InsertEnter)
+  {
+    "hrsh7th/nvim-cmp",
+    opts = {
+      performance = {
+        debounce = 60,
+        throttle = 30,
+        fetching_timeout = 200,
+        max_view_entries = 20,
+      },
+      sources = {
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+        { name = "buffer", keyword_length = 3 },  -- Don't scan 1-2 char words
+        { name = "nvim_lua" },
+        { name = "async_path" },
+      },
+    },
+  },
+
   -- Treesitter dengan optimizations
   {
     "nvim-treesitter/nvim-treesitter",

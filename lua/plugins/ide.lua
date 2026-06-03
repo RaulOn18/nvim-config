@@ -28,10 +28,10 @@ return {
     end,
   },
 
-  -- Which-key untuk discoverability
+  -- Which-key: NvChad loads it on keys/cmd trigger
+  -- Custom group specs go in which-key opts override
   {
     "folke/which-key.nvim",
-    event = "VeryLazy",
     opts = {
       plugins = { spelling = true },
       spec = {
@@ -56,38 +56,10 @@ return {
         },
       },
     },
-    config = function(_, opts)
-      require("which-key").setup(opts)
-    end,
   },
 
-  -- Indent blankline
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-      indent = {
-        char = "│",
-        tab_char = "│",
-      },
-      scope = { enabled = false },
-      exclude = {
-        filetypes = {
-          "help",
-          "alpha",
-          "dashboard",
-          "neo-tree",
-          "Trouble",
-          "lazy",
-          "mason",
-          "notify",
-          "toggleterm",
-          "lazyterm",
-        },
-      },
-    },
-    main = "ibl",
-  },
+  -- Indent blankline: NvChad loads it on User FilePost
+  -- No need to duplicate here
 
   -- Better folding (lazy load - only when fold commands used)
   {
