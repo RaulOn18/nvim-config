@@ -57,45 +57,10 @@ return {
     end,
   },
 
-  -- SQL Language Server (LSP)
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        -- sqlls - SQL Language Server untuk completion & diagnostics
-        sqlls = {
-          cmd = { "sql-language-server", "up", "--method", "stdio" },
-          filetypes = { "sql", "mysql" },
-          root_dir = function()
-            return vim.loop.cwd()
-          end,
-          settings = {
-            sqlLanguageServer = {
-              connections = {},
-            },
-          },
-        },
-      },
-    },
-  },
 
-  -- SQL Treesitter untuk syntax highlighting yang lebih baik
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      opts.highlight = opts.highlight or {}
-      opts.highlight.enable = true
-      
-      -- Pastikan SQL parser terinstall
-      if type(opts.ensure_installed) == "table" then
-        vim.list_extend(opts.ensure_installed, { "sql" })
-      else
-        opts.ensure_installed = { "sql" }
-      end
-      
-      return opts
-    end,
-  },
+
+  -- SQL Treesitter untuk syntax highlighting yang lebih baik (handled by core.lua)
+  -- No need to duplicate treesitter config here
 
   -- SQL formatter
   {

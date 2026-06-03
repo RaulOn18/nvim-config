@@ -12,7 +12,8 @@ return {
   -- LSP Config
   {
     "neovim/nvim-lspconfig",
-    lazy = false,
+    lazy = true,
+    event = { "BufReadPost", "BufNewFile" },
     priority = 1000,
     config = function()
       -- Suppress deprecation warning from old lspconfig
@@ -57,22 +58,23 @@ return {
         incremental_selection = { enable = false },  -- Disable for performance
       }
 
-      -- Ensure parsers are installed
-      local parsers = {
-        "vim", "lua", "vimdoc",
-        "html", "css", "tsx", "typescript",
-        "javascript", "json", "markdown", "markdown_inline",
-        "dart", "go", "sql",
-      }
+      -- Ensure parsers are installed (async, non-blocking)
+      vim.schedule(function()
+        local parsers = {
+          "vim", "lua", "vimdoc",
+          "html", "css", "tsx", "typescript",
+          "javascript", "json", "markdown", "markdown_inline",
+          "dart", "go", "sql",
+        }
 
-      -- Install missing parsers
-      for _, parser in ipairs(parsers) do
-        if not pcall(vim.treesitter.language.inspect, parser) then
-          pcall(function()
-             require('nvim-treesitter.install').install(parser)
-          end)
+        for _, parser in ipairs(parsers) do
+          if not pcall(vim.treesitter.language.inspect, parser) then
+            pcall(function()
+               require('nvim-treesitter.install').install(parser)
+            end)
+          end
         end
-      end
+      end)
     end,
   },
 }

@@ -27,13 +27,6 @@ local options = {
 
   -- Format on save disabled globally
   -- Use :ConformFormat or <leader>fm manually when needed
-  format_on_save = function(bufnr)
-    local ignore_filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact", "lua", "dart" }
-    if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
-      return nil
-    end
-    return nil
-  end,
 }
 
 return options

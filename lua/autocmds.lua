@@ -45,14 +45,15 @@ autocmd("LspAttach", {
   end,
 })
 
--- Reduce flicker on CursorHold
-autocmd({ "CursorHold", "CursorHoldI" }, {
-  group = nodejs_group,
-  pattern = "*",
-  callback = function()
-    vim.diagnostic.show()
-  end,
-})
+-- Reduce flicker on CursorHold (only show if virtual_text is disabled)
+-- With virtual_text enabled, diagnostics are already shown inline
+-- autocmd({ "CursorHold", "CursorHoldI" }, {
+--   group = nodejs_group,
+--   pattern = "*",
+--   callback = function()
+--     vim.diagnostic.show()
+--   end,
+-- })
 
 -- ============================================
 -- FLUTTER/DART SPECIFIC AUTOCMDS
@@ -164,13 +165,14 @@ autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 -- Auto-format SQL on save
-autocmd("BufWritePre", {
-  group = sql_group,
-  pattern = "*.sql",
-  callback = function()
-    local ok, conform = pcall(require, "conform")
-    if ok then
-      conform.format({ lsp_fallback = true })
-    end
-  end,
-})
+-- DISABLED: use <leader>cF manually when needed
+-- autocmd("BufWritePre", {
+--   group = sql_group,
+--   pattern = "*.sql",
+--   callback = function()
+--     local ok, conform = pcall(require, "conform")
+--     if ok then
+--       conform.format({ lsp_fallback = true })
+--     end
+--   end,
+-- })
