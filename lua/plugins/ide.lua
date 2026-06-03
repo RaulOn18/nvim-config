@@ -61,32 +61,7 @@ return {
   -- Indent blankline: NvChad loads it on User FilePost
   -- No need to duplicate here
 
-  -- Better folding (lazy load - only when fold commands used)
-  {
-    "kevinhwang91/nvim-ufo",
-    dependencies = { "kevinhwang91/promise-async" },
-    event = "BufReadPost",
-    opts = {
-      provider_selector = function(bufnr, filetype, buftype)
-        return { "treesitter", "indent" }
-      end,
-      close_fold_kinds_for_ft = {
-        default = { "imports", "comment" },
-      },
-      preview = {
-        win_config = {
-          border = "rounded",
-          winhighlight = "Normal:Folded",
-          winblend = 0,
-        },
-      },
-    },
-    config = function(_, opts)
-      vim.o.foldcolumn = "0"
-      vim.o.foldlevel = 99
-      vim.o.foldlevelstart = 99
-      vim.o.foldenable = true
-      require("ufo").setup(opts)
-    end,
-  },
+  -- Folding: use built-in manual folding (foldmethod=manual set in options.lua)
+  -- zR to open all, zM to close all, za to toggle, zf to create fold
+  -- No plugin needed - manual folding is the fastest
 }

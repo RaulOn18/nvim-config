@@ -98,21 +98,9 @@ return {
     end,
   },
 
-  -- Lightbulb for Code Actions
-  {
-    "kosayoda/nvim-lightbulb",
-    event = "LspAttach",
-    opts = {
-      autocmd = { enabled = true },
-      sign = { enabled = true },
-    },
-  },
+  -- Lightbulb: cosmetic only, code actions work without it
+  -- Removed for performance
 
-  -- Action Preview UI
-  {
-    "aznhe21/actions-preview.nvim",
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-    },
-  },
+  -- Action Preview: dead plugin, never called
+  -- Removed for performance
 }
