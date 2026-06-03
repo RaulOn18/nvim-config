@@ -67,8 +67,8 @@ return {
       
       opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
         prompt_prefix = " ",
-        selection_caret = "",
-        path_display = { "smart" },
+        selection_caret = "  ",
+        path_display = { "truncate" },
         sorting_strategy = "ascending",
         layout_config = {
           horizontal = {
