@@ -47,8 +47,10 @@ function M.setup_lsp(name, config)
   if config.filetypes then
     local group = vim.api.nvim_create_augroup("LspStart_" .. name, { clear = true })
 
-    -- Trigger on FileType
-    vim.api.nvim_create_autocmd({"BufReadPost", "BufNewFile", "FileType"}, {
+    -- Cache root_dir lookups per cwd to avoid repeated filesystem scans
+    local root_cache = {}
+
+    vim.api.nvim_create_autocmd("FileType", {
       pattern = "*",
       callback = function(args)
         local buf = args.buf
@@ -85,15 +87,22 @@ function M.setup_lsp(name, config)
           return
         end
 
-        -- Resolve root_dir if it's a function
+        -- Resolve root_dir if it's a function (with caching)
         local lsp_config = vim.deepcopy(config)
         if type(lsp_config.root_dir) == "function" then
-          local root = lsp_config.root_dir(fname)
-          if not root or root == "" then
-            -- No root found, skip to avoid undefined path errors
-            return
+          local file_dir = vim.fn.fnamemodify(fname, ":h")
+          local cache_key = file_dir .. "::" .. name
+          
+          if root_cache[cache_key] ~= nil then
+            lsp_config.root_dir = root_cache[cache_key]
+          else
+            local root = lsp_config.root_dir(fname)
+            if not root or root == "" then
+              return
+            end
+            root_cache[cache_key] = root
+            lsp_config.root_dir = root
           end
-          lsp_config.root_dir = root
         end
 
         -- Ensure root_dir is a valid string path

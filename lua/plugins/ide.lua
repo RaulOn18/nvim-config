@@ -25,37 +25,6 @@ return {
       if telescope_ok then
         telescope.load_extension("projects")
       end
-      
-      local ok, project = pcall(require, "project_nvim.project")
-      if ok then
-        vim.api.nvim_clear_autocmds({ group = "project_nvim" })
-        
-        -- Custom BufEnter: skip auto-chdir for submodule files
-        vim.api.nvim_create_autocmd("BufEnter", {
-          pattern = "*",
-          group = vim.api.nvim_create_augroup("ProjectNvimSafe", { clear = true }),
-          callback = function(args)
-            local buf = args.buf
-            local bufname = vim.api.nvim_buf_get_name(buf)
-            
-            if bufname == "" then return end
-            if bufname:match("^%w+://") then return end
-            
-            local buftype = vim.api.nvim_get_option_value("buftype", { buf = buf })
-            if buftype ~= "" then return end
-            
-            -- Skip chdir for files inside git submodules
-            -- git --show-superproject-working-tree returns parent repo path if in submodule
-            local file_dir = vim.fn.fnamemodify(bufname, ":h")
-            local super = vim.fn.systemlist("git -C " .. vim.fn.shellescape(file_dir) .. " rev-parse --show-superproject-working-tree 2>/dev/null")
-            if super and super[1] and super[1] ~= "" then
-              return -- inside submodule, don't chdir
-            end
-            
-            pcall(project.on_buf_enter)
-          end,
-        })
-      end
     end,
   },
 
@@ -120,7 +89,7 @@ return {
     main = "ibl",
   },
 
-  -- Better folding
+  -- Better folding (lazy load - only when fold commands used)
   {
     "kevinhwang91/nvim-ufo",
     dependencies = { "kevinhwang91/promise-async" },
@@ -129,6 +98,16 @@ return {
       provider_selector = function(bufnr, filetype, buftype)
         return { "treesitter", "indent" }
       end,
+      close_fold_kinds_for_ft = {
+        default = { "imports", "comment" },
+      },
+      preview = {
+        win_config = {
+          border = "rounded",
+          winhighlight = "Normal:Folded",
+          winblend = 0,
+        },
+      },
     },
     config = function(_, opts)
       vim.o.foldcolumn = "0"

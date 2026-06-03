@@ -52,6 +52,9 @@ return {
     config = function()
       require("nvim-treesitter.config").setup {
         install_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site'),
+        highlight = { enable = true },
+        indent = { enable = true },
+        incremental_selection = { enable = false },  -- Disable for performance
       }
 
       -- Ensure parsers are installed

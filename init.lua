@@ -9,10 +9,14 @@ vim.g.maplocalleader = " "
 vim.opt.shadafile = "NONE"
 
 -- Performance: Disable unused built-in plugins
--- vim.g.did_load_filetypes = 1  -- REMOVED: breaks filetype detection
 vim.g.did_load_fzf = 1
 vim.g.loaded_man = 1
 vim.g.loaded_remote_plugins = 1
+vim.g.did_load_gzip = 1
+vim.g.did_load_tar = 1
+vim.g.did_load_zip = 1
+vim.g.did_load_tutor = 1
+vim.g.did_load_spellfile_plugin = 1
 
 -- Performance: Disable swap/backup files
 vim.opt.swapfile = false

@@ -50,7 +50,7 @@ opt.expandtab = true
 -- ============================================
 
 -- Dart/Flutter specific: fold settings untuk widget tree
-opt.foldmethod = "syntax"
+opt.foldmethod = "manual"  -- manual = FASTEST, use zR/zM or nvim-ufo
 opt.foldlevel = 99  -- Open semua fold by default
 opt.foldlevelstart = 99
 
@@ -64,7 +64,7 @@ opt.linebreak = true
 opt.breakindent = true
 
 -- Sign column untuk LSP diagnostics (Flutter banyak warning/error saat dev)
-opt.signcolumn = "yes:2"
+opt.signcolumn = "yes"
 
 -- Clipboard untuk copy-paste code snippets Flutter
 opt.clipboard = "unnamedplus"
