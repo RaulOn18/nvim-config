@@ -178,15 +178,6 @@ return {
     },
   },
 
-  -- Better quickfix & diagnostics list
-  {
-    "folke/trouble.nvim",
-    cmd = { "Trouble", "TroubleToggle" },
-    keys = {
-      { "<leader>dd", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
-      { "<leader>db", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
-      { "<leader>ds", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
-    },
-    opts = {},
-  },
+  -- Diagnostics: use Telescope (faster, already loaded)
+  -- <leader>xx and <leader>xb mapped in mappings.lua
 }
