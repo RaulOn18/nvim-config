@@ -21,7 +21,7 @@ return {
       view = {
         width = 30,
         side = "left",
-        preserve_window_proportions = true,
+        preserve_window_proportions = false,
       },
       renderer = {
         indent_width = 1,
@@ -39,6 +39,7 @@ return {
           window_picker = {
             enable = true,
           },
+          resize_window = true,
         },
       },
     },

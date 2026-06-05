@@ -46,6 +46,12 @@ map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>", { desc = "Save file" })
 map("n", "<leader>bd", "<cmd>bdelete<cr>", { desc = "Close buffer" })
 map("n", "<leader>bo", "<cmd>%bd|e#<cr>", { desc = "Close other buffers" })
 
+-- Window splits
+map("n", "<leader>sv", "<cmd>vsplit<cr>", { desc = "Vertical Split" })
+map("n", "<leader>sh", "<cmd>split<cr>", { desc = "Horizontal Split" })
+map("n", "<leader>se", "<C-w>=", { desc = "Equalize Splits" })
+map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Close Split" })
+
 -- Quick close
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })

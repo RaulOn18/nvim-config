@@ -4,6 +4,10 @@ require "nvchad.autocmds"
 local autocmd = vim.api.nvim_create_autocmd
 local augroup = vim.api.nvim_create_augroup
 
+-- Preserve window proportions when NvimTree opens/closes
+-- DISABLED: causes performance issues
+-- local nvimtree_group = augroup("NvimTreeResize", { clear = true })
+
 -- Group untuk Node.js optimizations
 local nodejs_group = augroup("NodeJSOptimizations", { clear = true })
 
