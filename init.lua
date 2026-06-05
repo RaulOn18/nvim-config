@@ -8,6 +8,18 @@ vim.g.maplocalleader = " "
 -- Disable shada (no session persistence)
 vim.opt.shadafile = "NONE"
 
+-- Fix PATH: Remove Windows paths that break tools on Linux
+if vim.fn.has("unix") == 1 then
+  local path = vim.env.PATH or ""
+  local clean_paths = {}
+  for p in path:gmatch("[^:]+") do
+    if not p:match("^/mnt/") then
+      table.insert(clean_paths, p)
+    end
+  end
+  vim.env.PATH = table.concat(clean_paths, ":")
+end
+
 -- Performance: Disable unused built-in plugins
 vim.g.did_load_fzf = 1
 vim.g.loaded_man = 1
@@ -61,4 +73,10 @@ end)
 -- Basic settings
 vim.opt.relativenumber = true
 vim.opt.number = true
-vim.o.shell = "pwsh"
+
+-- Shell: auto-detect for Linux/Windows
+if vim.fn.has("unix") == 1 then
+  vim.o.shell = "/bin/bash"
+else
+  vim.o.shell = "pwsh"
+end

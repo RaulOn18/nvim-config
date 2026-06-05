@@ -71,6 +71,12 @@ return {
     event = { "BufReadPost", "BufNewFile" },
     build = ":TSUpdate",
     config = function()
+      -- Ensure treesitter uses local compiler on Linux
+      if vim.fn.has("unix") == 1 then
+        require("nvim-treesitter.install").compilers = { "gcc", "cc", "clang" }
+        vim.env.CC = "gcc"
+      end
+
       require("nvim-treesitter.config").setup {
         install_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site'),
         highlight = { enable = true },
