@@ -7,7 +7,7 @@ local M = {}
 
 M.base46 = {
   theme = "gruvchad",
-  transparency = false,
+  transparency = true,
   
   -- Better syntax highlighting
   hl_override = {
