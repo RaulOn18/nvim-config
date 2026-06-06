@@ -66,8 +66,17 @@ opt.breakindent = true
 -- Sign column untuk LSP diagnostics (Flutter banyak warning/error saat dev)
 opt.signcolumn = "yes"
 
--- Clipboard untuk copy-paste code snippets Flutter
-opt.clipboard = "unnamedplus"
+-- Clipboard: enable if clipboard provider is available
+if vim.fn.has("unix") == 1 then
+  local has_clip = vim.fn.executable("xclip") == 1 or vim.fn.executable("wl-copy") == 1
+  if has_clip then
+    opt.clipboard = "unnamedplus"
+  else
+    opt.clipboard = ""
+  end
+else
+  opt.clipboard = "unnamedplus"
+end
 
 -- Better search untuk Flutter projects
 opt.ignorecase = true

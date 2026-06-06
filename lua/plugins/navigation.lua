@@ -56,11 +56,17 @@ return {
       local actions = require("telescope.actions")
 
       -- Open file with path that handles parentheses (Next.js route groups)
+      -- Works on both Windows and Linux
       local function open_file(prompt_bufnr)
         local entry = require("telescope.actions.state").get_selected_entry()
         actions.close(prompt_bufnr)
         if entry and entry.path then
-          local path = entry.path:gsub("/", "\\")
+          local path = entry.path
+          -- Windows needs backslash separator
+          if vim.fn.has("win32") == 1 then
+            path = path:gsub("/", "\\")
+          end
+          -- Escape parentheses for Next.js route groups
           path = path:gsub("%(", "\\%("):gsub("%)", "\\%)")
           vim.cmd("edit " .. path)
         end
