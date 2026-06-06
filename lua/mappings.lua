@@ -4,6 +4,29 @@ require "nvchad.mappings"
 
 local map = vim.keymap.set
 
+-- Override NvChad's <leader>x (buffer close) to go to previous buffer
+map("n", "<leader>x", function()
+  local cur = vim.api.nvim_get_current_buf()
+  local bufs = vim.fn.getbufinfo({ buflisted = 1 })
+  table.sort(bufs, function(a, b) return a.lastused > b.lastused end)
+  
+  local target = nil
+  for _, buf in ipairs(bufs) do
+    if buf.bufnr ~= cur then
+      target = buf.bufnr
+      break
+    end
+  end
+  
+  if target then
+    vim.cmd("buffer " .. target)
+  else
+    vim.cmd("enew")
+  end
+  
+  vim.cmd("bdelete " .. cur)
+end, { desc = "Close buffer (go to previous)" })
+
 -- Basic mappings
 map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")
@@ -42,15 +65,51 @@ map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 -- Quick save
 map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>", { desc = "Save file" })
 
--- Buffer management
-map("n", "<leader>bd", "<cmd>bdelete<cr>", { desc = "Close buffer" })
+-- Buffer management: close and go to previous buffer
+map("n", "<leader>bd", function()
+  local cur = vim.api.nvim_get_current_buf()
+  -- Find previous buffer (most recently used)
+  local bufs = vim.fn.getbufinfo({ buflisted = 1 })
+  -- Sort by last used time (descending)
+  table.sort(bufs, function(a, b) return a.lastused > b.lastused end)
+  
+  -- Find the buffer that's not current
+  local target = nil
+  for _, buf in ipairs(bufs) do
+    if buf.bufnr ~= cur then
+      target = buf.bufnr
+      break
+    end
+  end
+  
+  if target then
+    vim.cmd("buffer " .. target)
+  else
+    -- No other buffer, open new empty
+    vim.cmd("enew")
+  end
+  
+  -- Delete the old buffer
+  vim.cmd("bdelete " .. cur)
+end, { desc = "Close buffer (go to previous)" })
+
 map("n", "<leader>bo", "<cmd>%bd|e#<cr>", { desc = "Close other buffers" })
 
--- Window splits
+-- Window splits: close and go to previous window
 map("n", "<leader>sv", "<cmd>vsplit<cr>", { desc = "Vertical Split" })
 map("n", "<leader>sh", "<cmd>split<cr>", { desc = "Horizontal Split" })
 map("n", "<leader>se", "<C-w>=", { desc = "Equalize Splits" })
-map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Close Split" })
+map("n", "<leader>sx", function()
+  local win_count = #vim.api.nvim_list_wins()
+  if win_count > 1 then
+    -- Go to previous window before closing
+    vim.cmd("wincmd p")
+    -- Close the window we just left (which was the current one)
+    vim.cmd("close")
+  else
+    vim.notify("Only one window", vim.log.levels.INFO)
+  end
+end, { desc = "Close Split (go to previous)" })
 
 -- Quick close
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
