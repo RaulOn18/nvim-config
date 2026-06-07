@@ -25,7 +25,7 @@ o.maxmempattern = 1000
 -- Memory optimizations
 opt.hidden = true
 opt.history = 100
-opt.undolevels = 100
+opt.undolevels = 1000
 
 -- Completion optimization - don't scan included files/tags
 opt.complete:remove("i")

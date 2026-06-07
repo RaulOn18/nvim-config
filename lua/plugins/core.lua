@@ -6,7 +6,9 @@ return {
   {
     "stevearc/conform.nvim",
     event = { "BufReadPre", "BufNewFile" },
-    opts = require "configs.conform",
+    config = function()
+      require("conform").setup(require "configs.conform")
+    end,
   },
 
   -- LSP Config

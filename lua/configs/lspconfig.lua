@@ -47,27 +47,25 @@ function M.setup_lsp(name, config)
     -- Cache root_dir lookups per cwd to avoid repeated filesystem scans
     local root_cache = {}
 
+    -- Pre-compute a set for O(1) filetype lookup instead of ipairs loop
+    local ft_set = {}
+    for _, f in ipairs(config.filetypes) do
+      ft_set[f] = true
+    end
+
     vim.api.nvim_create_autocmd("FileType", {
-      pattern = "*",
+      pattern = config.filetypes,
       callback = function(args)
         local buf = args.buf
         local ft = vim.bo[buf].filetype
 
-        -- If no filetype set, try to detect
         if ft == "" then
           vim.cmd("filetype detect")
           ft = vim.bo[buf].filetype
         end
 
-        -- Check if filetype matches
-        local match = false
-        for _, f in ipairs(config.filetypes) do
-          if ft == f then
-            match = true
-            break
-          end
-        end
-        if not match then return end
+        -- Fast guard: should always match since pattern=, but be safe
+        if not ft_set[ft] then return end
 
         -- Check if client already exists for this buffer
         local clients = vim.lsp.get_clients({ name = name })
@@ -84,8 +82,11 @@ function M.setup_lsp(name, config)
           return
         end
 
-        -- Resolve root_dir if it's a function (with caching)
-        local lsp_config = vim.deepcopy(config)
+        -- Build config for this buffer (shallow copy — only root_dir/settings change)
+        local lsp_config = {}
+        for k, v in pairs(config) do
+          lsp_config[k] = v
+        end
         if type(lsp_config.root_dir) == "function" then
           local file_dir = vim.fn.fnamemodify(fname, ":h")
           local cache_key = file_dir .. "::" .. name

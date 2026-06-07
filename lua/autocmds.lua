@@ -23,10 +23,14 @@ autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 -- Large file optimizations (>1MB)
+-- Only fires for real file paths, skips buffers without names
 autocmd("BufReadPre", {
   group = nodejs_group,
+  pattern = "*",
   callback = function(args)
-    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+    local fname = vim.api.nvim_buf_get_name(args.buf)
+    if fname == "" or fname:match("^%w+://") then return end
+    local ok, stats = pcall(vim.uv.fs_stat, fname)
     if ok and stats and stats.size > 1024 * 1024 then
       vim.opt_local.syntax = "off"
       vim.opt_local.foldmethod = "manual"
