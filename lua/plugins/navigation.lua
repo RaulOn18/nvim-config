@@ -2,9 +2,14 @@
 
 return {
   -- File explorer: NvChad loads nvim-tree on cmd trigger
-  -- Custom opts go in nvim-tree opts override below
+  -- Custom opts + keymaps
   {
     "nvim-tree/nvim-tree.lua",
+    keys = {
+      { "<C-n>", "<cmd>NvimTreeToggle<cr>", desc = "Toggle File Explorer" },
+      { "<leader>e", "<cmd>NvimTreeToggle<cr>", desc = "Toggle File Explorer" },
+      { "<leader>E", "<cmd>NvimTreeFindFile<cr>", desc = "Find File in Tree" },
+    },
     opts = {
       update_focused_file = {
         enable = true,
@@ -48,6 +53,22 @@ return {
   -- Better grep with ripgrep integration
   {
     "nvim-telescope/telescope.nvim",
+    keys = {
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
+      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
+      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Find Buffers" },
+      { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Find Help" },
+      { "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files" },
+      { "<leader>fc", "<cmd>Telescope grep_string<cr>", desc = "Find String Under Cursor" },
+      { "<leader>fr", "<cmd>Telescope resume<cr>", desc = "Resume Last Search" },
+      { "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find Keymaps" },
+      { "<leader>fC", "<cmd>Telescope commands<cr>", desc = "Find Commands" },
+      { "<leader>xx", "<cmd>Telescope diagnostics<cr>", desc = "All Diagnostics" },
+      { "<leader>xb", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "Buffer Diagnostics" },
+      { "<leader>xs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols" },
+      { "<leader>xl", "<cmd>Telescope lsp_references<cr>", desc = "LSP References" },
+      { "<leader>xq", "<cmd>Telescope quickfix<cr>", desc = "Quickfix List" },
+    },
     dependencies = {
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
       "nvim-telescope/telescope-ui-select.nvim",

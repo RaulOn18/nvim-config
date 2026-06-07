@@ -57,11 +57,4 @@ return {
       },
     },
   },
-
-  -- Indent blankline: NvChad loads it on User FilePost
-  -- No need to duplicate here
-
-  -- Folding: use built-in manual folding (foldmethod=manual set in options.lua)
-  -- zR to open all, zM to close all, za to toggle, zf to create fold
-  -- No plugin needed - manual folding is the fastest
 }

@@ -2,6 +2,7 @@
 -- Using vim.lsp.start() for Neovim 0.12+
 
 local M = {}
+local on_attach = require "configs.on_attach"
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -32,11 +33,7 @@ function M.setup_lsp(name, config)
   config.capabilities = capabilities
 
   if not config.on_attach then
-    config.on_attach = function(client, bufnr)
-      -- Default: disable formatting (use conform.nvim)
-      client.server_capabilities.documentFormattingProvider = false
-      client.server_capabilities.documentRangeFormattingProvider = false
-    end
+    config.on_attach = on_attach.on_attach
   end
 
   -- Store config for later use
@@ -166,11 +163,7 @@ M.setup_lsp("vtsls", {
     },
   },
   single_file_support = false,
-  on_attach = function(client, bufnr)
-    client.server_capabilities.documentFormattingProvider = false
-    client.server_capabilities.documentRangeFormattingProvider = false
-    client.server_capabilities.codeLensProvider = false
-  end,
+  -- override handled via on_attach module
 })
 
 -- ESLint
@@ -209,9 +202,7 @@ M.setup_lsp("eslint", {
   handlers = {
     ["eslint/probeFailed"] = function() return nil end,
   },
-  on_attach = function(client, bufnr)
-    client.server_capabilities.documentFormattingProvider = true
-  end,
+  -- override handled via on_attach module
 })
 
 -- Tailwind CSS

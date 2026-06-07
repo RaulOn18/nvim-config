@@ -14,6 +14,10 @@ local options = {
     -- DART/FLUTTER FORMATTERS
     -- ============================================
     dart = { "dart_format" },
+    -- ============================================
+    -- SQL FORMATTERS
+    -- ============================================
+    sql = { "sql_formatter" },
   },
 
   -- Formatters configuration
@@ -22,6 +26,9 @@ local options = {
       command = "dart",
       args = { "format", "$FILENAME" },
       stdin = false,
+    },
+    sql_formatter = {
+      args = { "--language", "sql" },
     },
   },
 

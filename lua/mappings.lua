@@ -119,11 +119,6 @@ map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })
 map("n", "<leader>fp", "<cmd>Telescope projects<cr>", { desc = "Find Projects" })
 map("n", "<leader>cd", function() require("utils.project").auto_cd_git_root() end, { desc = "CD to Git Root" })
 
--- File explorer (NvimTree) - toggle
-map("n", "<C-n>", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle File Explorer" })
-map("n", "<leader>e", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle File Explorer" })
-map("n", "<leader>E", "<cmd>NvimTreeFindFile<cr>", { desc = "Find File in Tree" })
-
 -- Telescope shortcuts
 map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
 map("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", { desc = "Live Grep" })
@@ -134,15 +129,6 @@ map("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Find String U
 map("n", "<leader>fr", "<cmd>Telescope resume<cr>", { desc = "Resume Last Search" })
 map("n", "<leader>fk", "<cmd>Telescope keymaps<cr>", { desc = "Find Keymaps" })
 map("n", "<leader>fC", "<cmd>Telescope commands<cr>", { desc = "Find Commands" })
-
--- Git
-map("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Neogit" })
-map("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Diff View" })
-map("n", "<leader>gD", "<cmd>DiffviewClose<cr>", { desc = "Close Diff View" })
-map("n", "<leader>gh", "<cmd>DiffviewFileHistory<cr>", { desc = "File History" })
-map("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Git Branches" })
-map("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Git Commits" })
-map("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Git Status" })
 
 -- Diagnostics (Telescope - faster than trouble.nvim)
 map("n", "<leader>xx", "<cmd>Telescope diagnostics<cr>", { desc = "All Diagnostics" })

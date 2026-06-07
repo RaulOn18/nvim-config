@@ -69,7 +69,13 @@ return {
     "NeogitOrg/neogit",
     cmd = "Neogit",
     keys = {
-      { "<leader>gg", "<cmd>Neogit<cr>", desc = "Open Neogit" },
+      { "<leader>gg", "<cmd>Neogit<cr>", desc = "Neogit" },
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diff View" },
+      { "<leader>gD", "<cmd>DiffviewClose<cr>", desc = "Close Diff View" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory<cr>", desc = "File History" },
+      { "<leader>gb", "<cmd>Telescope git_branches<cr>", desc = "Git Branches" },
+      { "<leader>gc", "<cmd>Telescope git_commits<cr>", desc = "Git Commits" },
+      { "<leader>gs", "<cmd>Telescope git_status<cr>", desc = "Git Status" },
     },
     dependencies = {
       "nvim-lua/plenary.nvim",

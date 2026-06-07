@@ -4,6 +4,25 @@ return {
   {
     "tpope/vim-dadbod",
     cmd = { "DB", "DBUI", "DBUIToggle", "DBUIAddConnection" },
+    init = function()
+      local autocmd = vim.api.nvim_create_autocmd
+      local augroup = vim.api.nvim_create_augroup
+      local sql_group = augroup("SQLOptimizations", { clear = true })
+
+      -- Set SQL filetype variations
+      autocmd({ "BufRead", "BufNewFile" }, {
+        group = sql_group,
+        pattern = { "*.sql", "*.mysql", "*.plsql", "*.pgsql" },
+        callback = function()
+          vim.opt_local.filetype = "sql"
+          vim.opt_local.commentstring = "-- %s"
+          vim.opt_local.expandtab = true
+          vim.opt_local.shiftwidth = 2
+          vim.opt_local.tabstop = 2
+          vim.opt_local.softtabstop = 2
+        end,
+      })
+    end,
   },
 
   -- UI for vim-dadbod
@@ -58,22 +77,4 @@ return {
   },
 
 
-
-  -- SQL Treesitter untuk syntax highlighting yang lebih baik (handled by core.lua)
-  -- No need to duplicate treesitter config here
-
-  -- SQL formatter
-  {
-    "stevearc/conform.nvim",
-    opts = {
-      formatters_by_ft = {
-        sql = { "sql_formatter" },
-      },
-      formatters = {
-        sql_formatter = {
-          args = { "--language", "sql" },
-        },
-      },
-    },
-  },
 }

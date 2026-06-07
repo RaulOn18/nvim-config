@@ -54,6 +54,102 @@ return {
     { "<leader>dw", function() require("dap.ui.widgets").hover() end, desc = "Widgets" },
   },
   config = function()
-    require("configs.dap")
+    local dap = require("dap")
+    local dap_utils = require("dap.utils")
+
+    -- Helper function to setup adapters lazily
+    local function setup_adapter(name, config)
+      if not dap.adapters[name] then
+        dap.adapters[name] = config
+      end
+    end
+
+    -- JS/TS
+    setup_adapter("node2", {
+      type = "executable",
+      command = "node",
+      args = { vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js" },
+    })
+    setup_adapter("pwa-node", {
+      type = "server",
+      host = "localhost",
+      port = "${port}",
+      executable = {
+        command = "node",
+        args = {
+          vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js",
+          "${port}",
+        },
+      },
+    })
+    setup_adapter("chrome", {
+      type = "executable",
+      command = "node",
+      args = { vim.fn.stdpath("data") .. "/mason/packages/chrome-debug-adapter/out/src/chromeDebug.js" },
+    })
+
+    dap.configurations.javascript = {
+      {
+        type = "node2",
+        request = "launch",
+        name = "Launch file",
+        program = "${file}",
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+        protocol = "inspector",
+        console = "integratedTerminal",
+        internalConsoleOptions = "neverOpen",
+      },
+      {
+        type = "node2",
+        request = "attach",
+        name = "Attach",
+        processId = dap_utils.pick_process,
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+        protocol = "inspector",
+        console = "integratedTerminal",
+      },
+    }
+    dap.configurations.typescript = dap.configurations.javascript
+    dap.configurations.javascriptreact = dap.configurations.javascript
+    dap.configurations.typescriptreact = dap.configurations.javascript
+
+    -- Go (Delve)
+    setup_adapter("delve", {
+      type = "server",
+      port = "${port}",
+      executable = {
+        command = vim.fn.stdpath("data") .. "/mason/packages/delve/dlv.exe",
+        args = { "dap", "-l", "127.0.0.1:${port}" },
+      },
+    })
+    dap.configurations.go = {
+      { type = "delve", name = "Debug", request = "launch", program = "${file}" },
+      { type = "delve", name = "Debug test", request = "launch", mode = "test", program = "${file}" },
+      { type = "delve", name = "Debug test (go.mod)", request = "launch", mode = "test", program = "./${relativeFileDirname}" },
+    }
+
+    -- Signs and highlights
+    vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+    vim.fn.sign_define("DapBreakpointCondition", { text = "◆", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
+    vim.fn.sign_define("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
+    vim.fn.sign_define("DapStopped", { text = "▶", texthl = "DapStopped", linehl = "DapStopped", numhl = "DapStopped" })
+    vim.fn.sign_define("DapBreakpointRejected", { text = "✖", texthl = "DapBreakpointRejected", linehl = "", numhl = "" })
+    vim.api.nvim_set_hl(0, "DapBreakpoint", { fg = "#ff5555" })
+    vim.api.nvim_set_hl(0, "DapBreakpointCondition", { fg = "#ffaa55" })
+    vim.api.nvim_set_hl(0, "DapLogPoint", { fg = "#55aaff" })
+    vim.api.nvim_set_hl(0, "DapStopped", { fg = "#55ff55", bg = "#225522" })
+    vim.api.nvim_set_hl(0, "DapBreakpointRejected", { fg = "#888888" })
+
+    -- Helper command
+    vim.api.nvim_create_user_command("DapSessionInfo", function()
+      local session = dap.session()
+      if session then
+        print(vim.inspect(session.config))
+      else
+        print("No active debug session")
+      end
+    end, { desc = "Show current DAP session info" })
   end,
 }
