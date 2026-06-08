@@ -1,0 +1,426 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "init.lua",
+      "file_type": "code",
+      "source_file": "init.lua",
+      "source_location": "L1",
+      "id": "init_lua",
+      "community": 1,
+      "norm_label": "init.lua"
+    },
+    {
+      "label": "autocmds.lua",
+      "file_type": "code",
+      "source_file": "lua/autocmds.lua",
+      "source_location": "L1",
+      "id": "lua_autocmds_lua",
+      "community": 7,
+      "norm_label": "autocmds.lua"
+    },
+    {
+      "label": "chadrc.lua",
+      "file_type": "code",
+      "source_file": "lua/chadrc.lua",
+      "source_location": "L1",
+      "id": "lua_chadrc_lua",
+      "community": 8,
+      "norm_label": "chadrc.lua"
+    },
+    {
+      "label": "mappings.lua",
+      "file_type": "code",
+      "source_file": "lua/mappings.lua",
+      "source_location": "L1",
+      "id": "lua_mappings_lua",
+      "community": 9,
+      "norm_label": "mappings.lua"
+    },
+    {
+      "label": "options.lua",
+      "file_type": "code",
+      "source_file": "lua/options.lua",
+      "source_location": "L1",
+      "id": "lua_options_lua",
+      "community": 10,
+      "norm_label": "options.lua"
+    },
+    {
+      "label": "conform.lua",
+      "file_type": "code",
+      "source_file": "lua/configs/conform.lua",
+      "source_location": "L1",
+      "id": "lua_configs_conform_lua",
+      "community": 11,
+      "norm_label": "conform.lua"
+    },
+    {
+      "label": "lazy.lua",
+      "file_type": "code",
+      "source_file": "lua/configs/lazy.lua",
+      "source_location": "L1",
+      "id": "lua_configs_lazy_lua",
+      "community": 12,
+      "norm_label": "lazy.lua"
+    },
+    {
+      "label": "lspconfig.lua",
+      "file_type": "code",
+      "source_file": "lua/configs/lspconfig.lua",
+      "source_location": "L1",
+      "id": "lua_configs_lspconfig_lua",
+      "community": 3,
+      "norm_label": "lspconfig.lua"
+    },
+    {
+      "label": "M.setup_lsp()",
+      "file_type": "code",
+      "source_file": "lua/configs/lspconfig.lua",
+      "source_location": "L31",
+      "id": "configs_lspconfig_m_setup_lsp",
+      "community": 3,
+      "norm_label": "m.setup_lsp()"
+    },
+    {
+      "label": "on_attach.lua",
+      "file_type": "code",
+      "source_file": "lua/configs/on_attach.lua",
+      "source_location": "L1",
+      "id": "lua_configs_on_attach_lua",
+      "community": 6,
+      "norm_label": "on_attach.lua"
+    },
+    {
+      "label": "M.on_attach()",
+      "file_type": "code",
+      "source_file": "lua/configs/on_attach.lua",
+      "source_location": "L20",
+      "id": "configs_on_attach_m_on_attach",
+      "community": 6,
+      "norm_label": "m.on_attach()"
+    },
+    {
+      "label": "ai.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/ai.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_ai_lua",
+      "community": 13,
+      "norm_label": "ai.lua"
+    },
+    {
+      "label": "core.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/core.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_core_lua",
+      "community": 14,
+      "norm_label": "core.lua"
+    },
+    {
+      "label": "debug.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/debug.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_debug_lua",
+      "community": 0,
+      "norm_label": "debug.lua"
+    },
+    {
+      "label": "ensure_signs()",
+      "file_type": "code",
+      "source_file": "lua/plugins/debug.lua",
+      "source_location": "L60",
+      "id": "plugins_debug_ensure_signs",
+      "community": 0,
+      "norm_label": "ensure_signs()"
+    },
+    {
+      "label": "ensure_adapters()",
+      "file_type": "code",
+      "source_file": "lua/plugins/debug.lua",
+      "source_location": "L75",
+      "id": "plugins_debug_ensure_adapters",
+      "community": 0,
+      "norm_label": "ensure_adapters()"
+    },
+    {
+      "label": "editing.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/editing.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_editing_lua",
+      "community": 15,
+      "norm_label": "editing.lua"
+    },
+    {
+      "label": "flutter.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/flutter.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_flutter_lua",
+      "community": 2,
+      "norm_label": "flutter.lua"
+    },
+    {
+      "label": "is_flutter_project()",
+      "file_type": "code",
+      "source_file": "lua/plugins/flutter.lua",
+      "source_location": "L82",
+      "id": "plugins_flutter_is_flutter_project",
+      "community": 2,
+      "norm_label": "is_flutter_project()"
+    },
+    {
+      "label": "git.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/git.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_git_lua",
+      "community": 4,
+      "norm_label": "git.lua"
+    },
+    {
+      "label": "map()",
+      "file_type": "code",
+      "source_file": "lua/plugins/git.lua",
+      "source_location": "L29",
+      "id": "plugins_git_map",
+      "community": 4,
+      "norm_label": "map()"
+    },
+    {
+      "label": "ide.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/ide.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_ide_lua",
+      "community": 16,
+      "norm_label": "ide.lua"
+    },
+    {
+      "label": "init.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/init.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_init_lua",
+      "community": 17,
+      "norm_label": "init.lua"
+    },
+    {
+      "label": "markdown.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/markdown.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_markdown_lua",
+      "community": 18,
+      "norm_label": "markdown.lua"
+    },
+    {
+      "label": "navigation.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/navigation.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_navigation_lua",
+      "community": 5,
+      "norm_label": "navigation.lua"
+    },
+    {
+      "label": "open_file()",
+      "file_type": "code",
+      "source_file": "lua/plugins/navigation.lua",
+      "source_location": "L81",
+      "id": "plugins_navigation_open_file",
+      "community": 5,
+      "norm_label": "open_file()"
+    },
+    {
+      "label": "sql.lua",
+      "file_type": "code",
+      "source_file": "lua/plugins/sql.lua",
+      "source_location": "L1",
+      "id": "lua_plugins_sql_lua",
+      "community": 19,
+      "norm_label": "sql.lua"
+    },
+    {
+      "label": "project.lua",
+      "file_type": "code",
+      "source_file": "lua/utils/project.lua",
+      "source_location": "L1",
+      "id": "lua_utils_project_lua",
+      "community": 20,
+      "norm_label": "project.lua"
+    },
+    {
+      "label": "NvChad Configuration",
+      "file_type": "document",
+      "source_file": "README.md",
+      "id": "nvchad_config",
+      "community": 1,
+      "norm_label": "nvchad configuration"
+    },
+    {
+      "label": "Lazy.nvim Plugin Manager",
+      "file_type": "document",
+      "source_file": "README.md",
+      "id": "lazy_nvim",
+      "community": 1,
+      "norm_label": "lazy.nvim plugin manager"
+    },
+    {
+      "label": "LSP Server Setup",
+      "file_type": "document",
+      "source_file": "README.md",
+      "id": "lsp_setup",
+      "community": 21,
+      "norm_label": "lsp server setup"
+    },
+    {
+      "label": "Treesitter Configuration",
+      "file_type": "document",
+      "source_file": "PERFORMANCE_ANALYSIS.md",
+      "id": "treesitter_config",
+      "community": 22,
+      "norm_label": "treesitter configuration"
+    },
+    {
+      "label": "Performance Options",
+      "file_type": "document",
+      "source_file": "PERFORMANCE_ANALYSIS.md",
+      "id": "performance_opts",
+      "community": 23,
+      "norm_label": "performance options"
+    },
+    {
+      "label": "Project Management",
+      "file_type": "document",
+      "source_file": "PERFORMANCE_CHANGES.md",
+      "id": "project_management",
+      "community": 24,
+      "norm_label": "project management"
+    },
+    {
+      "label": "Code Style Guide",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "id": "code_style",
+      "community": 25,
+      "norm_label": "code style guide"
+    },
+    {
+      "label": "Plugin Structure",
+      "file_type": "document",
+      "source_file": "README.md",
+      "id": "plugin_structure",
+      "community": 26,
+      "norm_label": "plugin structure"
+    },
+    {
+      "label": "Debug Support (DAP)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "id": "debug_support",
+      "community": 27,
+      "norm_label": "debug support (dap)"
+    },
+    {
+      "label": "AI Integration",
+      "file_type": "document",
+      "source_file": "README.md",
+      "id": "ai_integration",
+      "community": 28,
+      "norm_label": "ai integration"
+    }
+  ],
+  "links": [
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source": "init_lua",
+      "target": "nvchad_config"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source": "init_lua",
+      "target": "lazy_nvim"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/configs/lspconfig.lua",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "lua_configs_lspconfig_lua",
+      "target": "configs_lspconfig_m_setup_lsp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/configs/on_attach.lua",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "lua_configs_on_attach_lua",
+      "target": "configs_on_attach_m_on_attach",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/plugins/debug.lua",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "lua_plugins_debug_lua",
+      "target": "plugins_debug_ensure_signs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/plugins/debug.lua",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "lua_plugins_debug_lua",
+      "target": "plugins_debug_ensure_adapters",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/plugins/flutter.lua",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "lua_plugins_flutter_lua",
+      "target": "plugins_flutter_is_flutter_project",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/plugins/git.lua",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "lua_plugins_git_lua",
+      "target": "plugins_git_map",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lua/plugins/navigation.lua",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "lua_plugins_navigation_lua",
+      "target": "plugins_navigation_open_file",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": []
+}
