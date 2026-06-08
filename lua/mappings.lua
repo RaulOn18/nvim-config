@@ -183,6 +183,37 @@ map("n", "<leader>cl", "<cmd>LspInfo<cr>", { desc = "LSP Info" })
 map("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
 map("n", "]d", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
 
+-- Copy relative path + line number to clipboard
+map("n", "<leader>cp", function()
+  local rel = vim.fn.fnamemodify(vim.fn.expand("%"), ":.")
+  local line = vim.api.nvim_win_get_cursor(0)[1]
+  local text = rel .. ":" .. line
+  vim.fn.setreg("+", text)
+  vim.notify(text, vim.log.levels.INFO)
+end, { desc = "Copy relative path:line" })
+
+-- Copy relative path only (no line number)
+map("n", "<leader>cP", function()
+  local rel = vim.fn.fnamemodify(vim.fn.expand("%"), ":.")
+  vim.fn.setreg("+", rel)
+  vim.notify(rel, vim.log.levels.INFO)
+end, { desc = "Copy relative path" })
+
+-- Copy path:line in visual mode (uses first selected line)
+map("v", "<leader>cp", function()
+  local rel = vim.fn.fnamemodify(vim.fn.expand("%"), ":.")
+  local start_line = vim.api.nvim_buf_get_mark(0, "<")[1]
+  local end_line = vim.api.nvim_buf_get_mark(0, ">")[1]
+  local text
+  if start_line == end_line then
+    text = rel .. ":" .. start_line
+  else
+    text = rel .. ":" .. start_line .. "-" .. end_line
+  end
+  vim.fn.setreg("+", text)
+  vim.notify(text, vim.log.levels.INFO)
+end, { desc = "Copy relative path:lines" })
+
 -- Augment AI Mappings
 map("n", "<leader>ac", ":Augment chat ", { desc = "Augment Chat" })
 map("v", "<leader>ac", ":Augment chat ", { desc = "Augment Chat (selection)" })
