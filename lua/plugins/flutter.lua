@@ -5,7 +5,6 @@ return {
     ft = "dart",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "stevearc/dressing.nvim",
     },
     init = function()
       local autocmd = vim.api.nvim_create_autocmd

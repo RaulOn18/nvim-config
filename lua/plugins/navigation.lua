@@ -80,8 +80,8 @@ return {
       -- Works on both Windows and Linux
       local function open_file(prompt_bufnr)
         local entry = require("telescope.actions.state").get_selected_entry()
-        actions.close(prompt_bufnr)
         if entry and entry.path then
+          actions.close(prompt_bufnr)
           local path = entry.path
           -- Windows needs backslash separator
           if vim.fn.has("win32") == 1 then
@@ -90,6 +90,9 @@ return {
           -- Escape parentheses for Next.js route groups
           path = path:gsub("%(", "\\%("):gsub("%)", "\\%)")
           vim.cmd("edit " .. path)
+        else
+          -- For non-file entries (code actions, etc), use default select action
+          actions.select_default(prompt_bufnr)
         end
       end
       
