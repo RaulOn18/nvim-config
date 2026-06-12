@@ -24,7 +24,17 @@ map("n", "<leader>x", function()
     vim.cmd("enew")
   end
   
-  vim.cmd("bdelete " .. cur)
+  -- Modified buffer → confirm, else force delete
+  if vim.bo[cur].modified then
+    local choice = vim.fn.confirm("Save changes to " .. vim.fn.bufname(cur) .. "?", "&Yes\n&No\n&Cancel", 2)
+    if choice == 1 then
+      vim.cmd("bdelete " .. cur)
+    elseif choice == 2 then
+      vim.cmd("bdelete! " .. cur)
+    end
+  else
+    vim.cmd("bdelete! " .. cur)
+  end
 end, { desc = "Close buffer (go to previous)" })
 
 -- Basic mappings
@@ -90,7 +100,16 @@ map("n", "<leader>bd", function()
   end
   
   -- Delete the old buffer
-  vim.cmd("bdelete " .. cur)
+  if vim.bo[cur].modified then
+    local choice = vim.fn.confirm("Save changes to " .. vim.fn.bufname(cur) .. "?", "&Yes\n&No\n&Cancel", 2)
+    if choice == 1 then
+      vim.cmd("bdelete " .. cur)
+    elseif choice == 2 then
+      vim.cmd("bdelete! " .. cur)
+    end
+  else
+    vim.cmd("bdelete! " .. cur)
+  end
 end, { desc = "Close buffer (go to previous)" })
 
 map("n", "<leader>bo", "<cmd>%bd|e#<cr>", { desc = "Close other buffers" })
