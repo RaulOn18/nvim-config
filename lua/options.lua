@@ -95,3 +95,46 @@ vim.g.flutter_tools_log_level = "WARN"  -- Reduce log spam
 vim.g.flutter_show_log_on_run = "error"  -- Only show log on error
 
 -- dart-vim-plugin disabled (using flutter-tools.nvim + conform.nvim instead)
+
+-- ============================================
+-- KOTLIN/ANDROID SPECIFIC OPTIONS
+-- ============================================
+
+-- Kotlin indent: 4 spaces (Android convention) + no-wrap + commentstring + gradle wrapper
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "kotlin",
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.softtabstop = 4
+    vim.opt_local.expandtab = true
+    vim.opt_local.wrap = false
+    vim.bo.commentstring = "// %s"
+    -- Use project-local gradle wrapper
+    local cwd = vim.fn.getcwd()
+    local gradlew = cwd .. "/gradlew"
+    if vim.fn.has("win32") == 1 then
+      gradlew = cwd .. "/gradlew.bat"
+    end
+    if vim.fn.filereadable(gradlew) == 1 then
+      vim.env.GRADLE_HOME = cwd
+    end
+  end,
+})
+
+  -- Kotlin: set path for Android SDK in environment
+if vim.env.ANDROID_HOME == nil and vim.env.ANDROID_SDK_ROOT == nil then
+  -- Try common locations
+  local home = vim.env.HOME or vim.env.USERPROFILE or ""
+  local sdk_paths = {
+    home .. "/AppData/Local/Android/Sdk",
+    home .. "/Library/Android/sdk",
+    home .. "/Android/Sdk",
+  }
+  for _, path in ipairs(sdk_paths) do
+    if vim.fn.isdirectory(path) == 1 then
+      vim.env.ANDROID_HOME = path
+      break
+    end
+  end
+end

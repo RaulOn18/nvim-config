@@ -266,6 +266,54 @@ M.setup_lsp("sqlls", {
   end,
 })
 
+-- Kotlin (Android/Compose)
+M.setup_lsp("kotlin_language_server", {
+  cmd = { "kotlin-language-server" },
+  filetypes = { "kotlin" },
+  root_dir = function(fname)
+    local util = require "lspconfig.util"
+    return util.root_pattern(
+      "settings.gradle.kts",
+      "settings.gradle",
+      "build.gradle.kts",
+      "build.gradle",
+      "gradlew"
+    )(fname)
+  end,
+  single_file_support = false,
+  settings = {
+    kotlin = {
+      compiler = {
+        jvm = {
+          target = "17",
+        },
+      },
+      codegen = {
+        enabled = true,
+      },
+      completion = {
+        snippets = {
+          enabled = true,
+        },
+      },
+      linting = {
+        debounce = 250,
+      },
+    },
+  },
+  flags = {
+    debounce_text_changes = 150,
+  },
+  init_options = {
+    -- Enable storagePath for better performance
+    storagePath = vim.fn.stdpath("data") .. "/kotlin-language-server",
+  },
+  -- Android specific settings
+  android = {
+    sdkPath = vim.env.ANDROID_HOME or vim.env.ANDROID_SDK_ROOT or "",
+  },
+})
+
 -- Diagnostic config
 vim.diagnostic.config {
   virtual_text = {

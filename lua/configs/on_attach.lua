@@ -15,6 +15,10 @@ M.server_overrides = {
   eslint = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = true
   end,
+  -- kotlin: disable semantic tokens (heavy, slow on large projects)
+  kotlin_language_server = function(client, bufnr)
+    client.server_capabilities.semanticTokensProvider = nil
+  end,
 }
 
 function M.on_attach(client, bufnr)

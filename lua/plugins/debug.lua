@@ -135,7 +135,56 @@ return {
         { type = "delve", name = "Debug test (go.mod)", request = "launch", mode = "test", program = "./${relativeFileDirname}" },
       }
 
+      -- Kotlin (kotlin-debug-adapter via Mason)
+      -- Install: :MasonInstall kotlin-debug-adapter
+      local kotlin_adapter_path = vim.fn.stdpath("data") .. "/mason/packages/kotlin-debug-adapter/bin/kotlin-debug-adapter"
+      if vim.fn.has("win32") == 1 then
+        kotlin_adapter_path = kotlin_adapter_path .. ".bat"
+      end
+      if vim.fn.filereadable(kotlin_adapter_path) == 1 then
+        dap.adapters["kotlin"] = {
+          type = "executable",
+          command = kotlin_adapter_path,
+          args = { "--stdio" },
+        }
+        dap.configurations.kotlin = {
+          {
+            type = "kotlin",
+            request = "launch",
+            name = "Launch Kotlin",
+            projectRoot = "${workspaceFolder}",
+            mainClass = function()
+              return vim.fn.input("Main class (e.g. com.example.MainKt): ")
+            end,
+          },
+          {
+            type = "kotlin",
+            request = "launch",
+            name = "Launch Android",
+            projectRoot = "${workspaceFolder}",
+            mainClass = "android.app.Activity",
+          },
+        }
+      end
+
+      -- Android (adb via Mason)
+      -- For Android debugging, use gradle + adb directly
+      -- or install android-debug-adapter via Mason if available
+      -- Common adb commands:
+      --   adb devices - list connected devices
+      --   adb install -r app.apk - install APK
+      --   adb logcat - view logs
+      --   adb shell am start - launch app
+      --
+      -- Android debug workflow:
+      -- 1. <leader>Ka - assembleDebug (build APK)
+      -- 2. <leader>Ki - installDebug (install to device)
+      -- 3. <leader>KD - list devices
+      -- 4. <leader>KL - logcat
+      -- 5. <leader>dc - start debug session
+
       -- Signs on first session
+
       dap.listeners.after.event_initialized["lazy_signs"] = ensure_signs
     end
 

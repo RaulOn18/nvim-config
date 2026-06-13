@@ -18,6 +18,10 @@ local options = {
     -- SQL FORMATTERS
     -- ============================================
     sql = { "sql_formatter" },
+    -- ============================================
+    -- KOTLIN FORMATTERS
+    -- ============================================
+    kotlin = { "ktfmt" },
   },
 
   -- Formatters configuration
@@ -29,6 +33,24 @@ local options = {
     },
     sql_formatter = {
       args = { "--language", "sql" },
+    },
+    ktfmt = {
+      command = "ktfmt",
+      args = {
+        "--google_style",
+        "--stdin",
+        "$FILENAME",
+      },
+      stdin = true,
+      -- fallback: try ktlint if ktfmt not found
+      condition = function(self, ctx)
+        return vim.fn.executable("ktfmt") == 1
+      end,
+    },
+    ktlint = {
+      command = "ktlint",
+      args = { "--format", "--stdin" },
+      stdin = true,
     },
   },
 

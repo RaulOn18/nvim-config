@@ -11,23 +11,7 @@ return {
       local augroup = vim.api.nvim_create_augroup
       local flutter_group = augroup("FlutterOptimizations", { clear = true })
 
-      -- Disable LSP untuk build dan cache folders
-      autocmd({ "BufRead", "BufNewFile" }, {
-        group = flutter_group,
-        pattern = {
-          "*/build/*",
-          "*/.dart_tool/*",
-          "*/.flutter-plugins*",
-          "*/.pub-cache/*",
-          "*/.flutter/*",
-        },
-        callback = function()
-          vim.opt_local.readonly = true
-          vim.opt_local.modifiable = false
-          vim.opt_local.buflisted = false
-          vim.opt_local.syntax = "off"
-        end,
-      })
+      -- build/cache folders handled globally by autocmds.lua
 
       -- Set filetype untuk pubspec.yaml biar ada highlighting
       autocmd({ "BufRead", "BufNewFile" }, {

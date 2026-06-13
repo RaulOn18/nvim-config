@@ -43,4 +43,12 @@ return {
     event = "VeryLazy",
     opts = {},
   },
+
+  -- Snippets (NvChad already loads LuaSnip via nvim-cmp)
+  -- friendly-snippets adds Kotlin/Compose snippets automatically
+  {
+    "rafamadriz/friendly-snippets",
+    lazy = true,
+    event = "InsertEnter",
+  },
 }

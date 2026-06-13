@@ -12,4 +12,5 @@ return {
   { import = "plugins.flutter" },   -- Flutter development
   { import = "plugins.markdown" },  -- Markdown support
   { import = "plugins.sql" },       -- SQL editor support
+  { import = "plugins.kotlin" },    -- Kotlin/Android/Compose support
 }

@@ -63,11 +63,6 @@ return {
       { "<leader>fr", "<cmd>Telescope resume<cr>", desc = "Resume Last Search" },
       { "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find Keymaps" },
       { "<leader>fC", "<cmd>Telescope commands<cr>", desc = "Find Commands" },
-      { "<leader>xx", "<cmd>Telescope diagnostics<cr>", desc = "All Diagnostics" },
-      { "<leader>xb", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "Buffer Diagnostics" },
-      { "<leader>xs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols" },
-      { "<leader>xl", "<cmd>Telescope lsp_references<cr>", desc = "LSP References" },
-      { "<leader>xq", "<cmd>Telescope quickfix<cr>", desc = "Quickfix List" },
     },
     dependencies = {
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
@@ -175,10 +170,9 @@ return {
       return opts
     end,
     config = function(_, opts)
-      local telescope = require("telescope")
-      telescope.setup(opts)
-      telescope.load_extension("fzf")
-      telescope.load_extension("ui-select")
+      require("telescope").setup(opts)
+      require("telescope").load_extension("fzf")
+      require("telescope").load_extension("ui-select")
     end,
   },
 

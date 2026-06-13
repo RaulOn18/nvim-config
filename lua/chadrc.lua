@@ -16,6 +16,15 @@ M.base46 = {
     ["@keyword"] = { italic = true },
     ["@keyword.function"] = { italic = true },
     ["@keyword.return"] = { italic = true },
+    -- Kotlin specific
+    ["@keyword.kotlin"] = { italic = true },
+    ["@function.kotlin"] = { italic = false },
+    ["@type.kotlin"] = { bold = true },
+    ["@lsp.type.class.kotlin"] = { bold = true },
+    ["@lsp.type.function.kotlin"] = { italic = false },
+    ["@lsp.type.property.kotlin"] = { link = "@property" },
+    ["@lsp.type.annotation.kotlin"] = { link = "@attribute" },
+    ["@lsp.type.parameter.kotlin"] = { italic = true },
   },
 }
 

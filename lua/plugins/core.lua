@@ -93,6 +93,7 @@ return {
           "html", "css", "tsx", "typescript",
           "javascript", "json", "markdown", "markdown_inline",
           "dart", "go", "sql",
+          "kotlin",
         }
 
         for _, parser in ipairs(parsers) do

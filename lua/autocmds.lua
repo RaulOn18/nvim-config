@@ -22,8 +22,7 @@ autocmd({ "BufRead", "BufNewFile" }, {
   end,
 })
 
--- Large file optimizations (>1MB)
--- Only fires for real file paths, skips buffers without names
+-- Large file optimizations (>1MB) - all filetypes
 autocmd("BufReadPre", {
   group = nodejs_group,
   pattern = "*",
@@ -38,6 +37,28 @@ autocmd("BufReadPre", {
       vim.opt_local.swapfile = false
       vim.notify("Large file detected - optimizations applied", vim.log.levels.INFO)
     end
+  end,
+})
+
+-- Auto-generated/build folders - readonly, no LSP
+autocmd({ "BufRead", "BufNewFile" }, {
+  group = nodejs_group,
+  pattern = {
+    "*/build/*",
+    "*/.gradle/*",
+    "*/.idea/*",
+    "*/.kotlin/*",
+    "*/.navigation/*",
+    "*/.dart_tool/*",
+    "*/.flutter-plugins*",
+    "*/.pub-cache/*",
+    "*/.flutter/*",
+  },
+  callback = function()
+    vim.opt_local.readonly = true
+    vim.opt_local.modifiable = false
+    vim.opt_local.buflisted = false
+    vim.opt_local.syntax = "off"
   end,
 })
 
