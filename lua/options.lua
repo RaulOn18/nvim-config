@@ -5,8 +5,8 @@ local o = vim.o
 local opt = vim.opt
 
 -- LSP Performance
-o.updatetime = 250  -- Faster completion (default 4000ms too slow)
-o.timeoutlen = 500
+o.updatetime = 150  -- Faster CursorHold trigger (default 4000ms too slow)
+o.timeoutlen = 300  -- Faster key sequence timeout
 o.ttimeoutlen = 10
 
 -- Terminal rendering

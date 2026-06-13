@@ -19,6 +19,10 @@ local options = {
     -- ============================================
     sql = { "sql_formatter" },
     -- ============================================
+    -- GO FORMATTERS
+    -- ============================================
+    go = { "gofumpt", "goimports" },
+    -- ============================================
     -- KOTLIN FORMATTERS
     -- ============================================
     kotlin = { "ktfmt" },
@@ -33,6 +37,14 @@ local options = {
     },
     sql_formatter = {
       args = { "--language", "sql" },
+    },
+    gofumpt = {
+      command = "gofumpt",
+      stdin = true,
+    },
+    goimports = {
+      command = "goimports",
+      stdin = true,
     },
     ktfmt = {
       command = "ktfmt",

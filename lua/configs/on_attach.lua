@@ -15,9 +15,14 @@ M.server_overrides = {
   eslint = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = true
   end,
-  -- kotlin: disable semantic tokens (heavy, slow on large projects)
-  kotlin_language_server = function(client, bufnr)
+  -- kotlin-lsp: disable semantic tokens (heavy, slow on large projects)
+  kotlin_lsp = function(client, bufnr)
     client.server_capabilities.semanticTokensProvider = nil
+  end,
+  -- gopls: disable formatting (conform handles gofumpt + goimports)
+  gopls = function(client, bufnr)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
   end,
 }
 

@@ -7,6 +7,12 @@ local on_attach = require "configs.on_attach"
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+-- Merge cmp_nvim_lsp capabilities (better completion support)
+local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+if ok_cmp then
+  capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
+end
+
 -- Suppress ESLint -32603 errors globally (Windows path handling bug)
 local orig_publish = vim.lsp.handlers["textDocument/publishDiagnostics"]
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)

@@ -13,6 +13,14 @@ return {
       "folke/trouble.nvim",
     },
     config = function()
+      local on_attach = require "configs.on_attach"
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
+      local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+      if ok_cmp then
+        capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
+      end
+
       require("kotlin").setup {
         -- Root markers for Android/Gradle projects
         root_markers = {
@@ -35,6 +43,12 @@ return {
 
         -- Code folding
         folding = { enabled = true },
+
+        -- LSP config: force cmp capabilities + shared on_attach
+        lsp = {
+          on_attach = on_attach.on_attach,
+          capabilities = capabilities,
+        },
       }
     end,
   },

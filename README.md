@@ -13,7 +13,7 @@ A **modern, modular, and blazing-fast** Neovim configuration forked from [NvChad
 ## ✨ Features
 
 - ⚡ **Fast Startup** - Lazy-loaded plugins for optimal performance
-- 🎯 **LSP Ready** - Pre-configured for TypeScript, JavaScript, Go, Flutter, and more
+- 🎯 **LSP Ready** - Pre-configured for TypeScript, JavaScript, Go, Flutter, Kotlin, and more
 - 🎨 **Beautiful UI** - Modern theme with customizable icons and highlights
 - 🔧 **Modular Structure** - Easy to maintain and extend
 - 🐛 **Debug Support** - Integrated DAP with lazy-loaded adapters (JS/Go/Python/Flutter)

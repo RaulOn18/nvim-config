@@ -52,17 +52,30 @@ return {
     "hrsh7th/nvim-cmp",
     opts = {
       performance = {
-        debounce = 60,
-        throttle = 30,
-        fetching_timeout = 200,
-        max_view_entries = 20,
+        debounce = 120,        -- Wait 120ms before triggering (reduce LSP spam)
+        throttle = 60,         -- Max once per 60ms (smoother)
+        fetching_timeout = 400, -- Give LSP 400ms to respond
+        max_view_entries = 15, -- Fewer entries = faster render
+      },
+      completion = {
+        keyword_length = 2,    -- Trigger after 2 chars (less noise)
+        autocomplete = { "InsertEnter", "TextChanged" },  -- Not on every keystroke
       },
       sources = {
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "buffer", keyword_length = 3 },  -- Don't scan 1-2 char words
-        { name = "nvim_lua" },
-        { name = "async_path" },
+        { name = "nvim_lsp", priority = 1000 },
+        { name = "luasnip", priority = 750 },
+        { name = "async_path", priority = 500 },
+        -- buffer source: only in non-LSP files to reduce noise
+        { name = "buffer", keyword_length = 3, priority = 250,
+          option = {
+            get_bufnrs = function()
+              -- Only current buffer, not all loaded buffers
+              return { vim.api.nvim_get_current_buf() }
+            end,
+          },
+        },
+        -- nvim_lua: only enable in lua files
+        { name = "nvim_lua", priority = 100 },
       },
     },
   },
