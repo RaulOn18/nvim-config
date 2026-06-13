@@ -24,6 +24,7 @@ return {
         ignore_dirs = {
           ".next",
           "node_modules",
+          ".wrangler",
           ".git",
           "dist",
           "build",
