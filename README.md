@@ -6,7 +6,7 @@
 
 A **modern, modular, and blazing-fast** Neovim configuration forked from [NvChad](https://github.com/NvChad/NvChad), optimized for **JavaScript/TypeScript**, **Go**, **Flutter**, **Kotlin**, **SQL**, and **Node.js** development.
 
-![Preview](https://via.placeholder.com/800x400/1a1b26/a9b1d6?text=Neovim+Configuration+Preview)
+![Preview](https://raw.githubusercontent.com/RaulOn18/nvim-config/refs/heads/main/screenshot.png)
 
 ---
 
