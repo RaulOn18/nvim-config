@@ -90,6 +90,13 @@ return {
           -- Escape parentheses for Next.js route groups
           path = path:gsub("%(", "\\%("):gsub("%)", "\\%)")
           vim.cmd("edit " .. path)
+          -- Jump to match position (line + col) for grep results
+          if entry.lnum then
+            local lnum = entry.lnum
+            local col = (entry.col and entry.col > 0) and (entry.col - 1) or 0
+            vim.api.nvim_win_set_cursor(0, { lnum, col })
+            vim.cmd("normal! zz")
+          end
         else
           -- For non-file entries (code actions, etc), use default select action
           actions.select_default(prompt_bufnr)
