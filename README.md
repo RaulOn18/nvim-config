@@ -1,10 +1,10 @@
-# 🚀 NvChad - Professional Neovim Configuration
+# 🚀 RaulNvim - Professional Neovim Configuration
 
-[![Neovim](https://img.shields.io/badge/Neovim-0.10+-blueviolet.svg?style=for-the-badge&logo=neovim)](https://neovim.io/)
+[![Neovim](https://img.shields.io/badge/Neovim-0.12+-blueviolet.svg?style=for-the-badge&logo=neovim)](https://neovim.io/)
 [![Lua](https://img.shields.io/badge/Lua-%232C2D72.svg?style=for-the-badge&logo=lua&logoColor=white)](https://lua.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-A **modern, modular, and blazing-fast** Neovim configuration built on top of [NvChad](https://github.com/NvChad/NvChad), optimized for **JavaScript/TypeScript**, **Go**, **Flutter**, and **Node.js** development.
+A **modern, modular, and blazing-fast** Neovim configuration forked from [NvChad](https://github.com/NvChad/NvChad), optimized for **JavaScript/TypeScript**, **Go**, **Flutter**, **Kotlin**, **SQL**, and **Node.js** development.
 
 ![Preview](https://via.placeholder.com/800x400/1a1b26/a9b1d6?text=Neovim+Configuration+Preview)
 
@@ -16,7 +16,7 @@ A **modern, modular, and blazing-fast** Neovim configuration built on top of [Nv
 - 🎯 **LSP Ready** - Pre-configured for TypeScript, JavaScript, Go, Flutter, and more
 - 🎨 **Beautiful UI** - Modern theme with customizable icons and highlights
 - 🔧 **Modular Structure** - Easy to maintain and extend
-- 🐛 **Debug Support** - Integrated DAP with lazy-loaded adapters
+- 🐛 **Debug Support** - Integrated DAP with lazy-loaded adapters (JS/Go/Python/Flutter)
 - 🌳 **File Explorer** - Oil.nvim for buffer-like file editing
 - 🔍 **Fuzzy Finder** - Telescope with ripgrep integration
 - 🤖 **AI Assistant** - Augment AI integration for code assistance
@@ -26,7 +26,7 @@ A **modern, modular, and blazing-fast** Neovim configuration built on top of [Nv
 
 ## 📋 Prerequisites
 
-- [Neovim](https://neovim.io/) >= 0.10
+- [Neovim](https://neovim.io/) >= 0.12
 - [Git](https://git-scm.com/)
 - [Node.js](https://nodejs.org/) (for JavaScript/TypeScript LSP)
 - [ripgrep](https://github.com/BurntSushi/ripgrep) (for Telescope)
@@ -56,10 +56,10 @@ Rename-Item $env:LOCALAPPDATA\nvim $env:LOCALAPPDATA\nvim.bak
 
 ```bash
 # Linux/Mac
-git clone https://github.com/username/nvchad-config.git ~/.config/nvim
+git clone https://github.com/username/RaulNvim.git ~/.config/nvim
 
 # Windows (PowerShell)
-git clone https://github.com/username/nvchad-config.git $env:LOCALAPPDATA\nvim
+git clone https://github.com/username/RaulNvim.git $env:LOCALAPPDATA\nvim
 ```
 
 ### 3. Start Neovim
@@ -81,23 +81,28 @@ Lazy.nvim will automatically install all plugins on first run.
 │   ├── options.lua            # Vim options & performance settings
 │   ├── mappings.lua           # Key mappings
 │   ├── autocmds.lua           # Autocommands
-│   ├── chadrc.lua            # NvChad UI configuration
+│   ├── chadrc.lua            # RaulNvim UI configuration
 │   ├── configs/
-│   │   ├── lspconfig.lua     # LSP server configurations
+│   │   ├── lspconfig.lua     # LSP server configurations (vim.lsp.start)
+│   │   ├── on_attach.lua     # Shared LSP on_attach handlers
 │   │   ├── conform.lua       # Formatter configuration
 │   │   ├── dap.lua          # Debug adapter configuration
 │   │   └── lazy.lua         # Lazy.nvim settings
-│   └── plugins/
-│       ├── init.lua          # Plugin entry point
-│       ├── core.lua          # Core dev tools (LSP, formatter, treesitter)
-│       ├── git.lua           # Git integration
-│       ├── navigation.lua    # File explorer, telescope
-│       ├── editing.lua       # Editing enhancements
-│       ├── ide.lua           # Project management, UI
-│       ├── ai.lua            # AI assistants
-│       ├── debug.lua         # DAP debugging
-│       ├── flutter.lua       # Flutter support
-│       └── markdown.lua      # Markdown support
+│   ├── plugins/
+│   │   ├── init.lua          # Plugin entry point
+│   │   ├── core.lua          # Core dev tools (LSP, formatter, treesitter)
+│   │   ├── git.lua           # Git integration
+│   │   ├── navigation.lua    # File explorer, telescope
+│   │   ├── editing.lua       # Editing enhancements
+│   │   ├── ide.lua           # Project management, UI
+│   │   ├── ai.lua            # AI assistants (Augment)
+│   │   ├── debug.lua         # DAP debugging
+│   │   ├── flutter.lua       # Flutter support
+│   │   ├── kotlin.lua        # Kotlin/Android support
+│   │   ├── markdown.lua      # Markdown support
+│   │   └── sql.lua           # SQL editor support
+│   └── utils/
+│       └── project.lua       # Project management utilities
 ```
 
 ---
@@ -200,10 +205,14 @@ return {
 Edit `lua/configs/lspconfig.lua` to add/modify language servers:
 
 ```lua
-vim.lsp.config("myserver", {
+-- Uses custom setup_lsp() wrapper around vim.lsp.start()
+M.setup_lsp("myserver", {
   cmd = { "myserver", "--stdio" },
   filetypes = { "myfiletype" },
-  root_markers = { ".git", "config.json" },
+  root_dir = function(fname)
+    local util = require "lspconfig.util"
+    return util.root_pattern("config.json")(fname)
+  end,
 })
 ```
 
@@ -226,6 +235,8 @@ map("n", "<leader>xx", "<cmd>MyCommand<cr>", { desc = "My description" })
 | Go | ✅ gopls | ✅ gofmt/gofumpt | ✅ delve |
 | Python | ✅ pyright | ✅ black | ✅ debugpy |
 | Flutter/Dart | ✅ dartls | ✅ dart_format | ✅ flutter-tools |
+| Kotlin/Android | ✅ kotlin_language_server | ✅ ktlint | ✅ kotlin-debug-adapter |
+| SQL | ✅ sqlls | ✅ sql-formatter | ❌ |
 | CSS/SCSS | ✅ cssls | ✅ prettier | ❌ |
 | HTML | ✅ html | ✅ prettier | ❌ |
 | Lua | ✅ lua_ls | ✅ stylua | ❌ |
@@ -234,11 +245,12 @@ map("n", "<leader>xx", "<cmd>MyCommand<cr>", { desc = "My description" })
 
 ## ⚡ Performance Optimizations
 
-- **Lazy Loading** - All plugins loaded on-demand
+- **Lazy Loading** - All plugins loaded on-demand (event/cmd/keys/ft triggers)
+- **LSP Root Caching** - Per-cwd root_dir lookups cached to avoid repeated filesystem scans
 - **Treesitter** - Disabled for large files (>500KB) and node_modules
-- **LSP Handlers** - Optimized diagnostic handling
-- **File Watcher** - libuv-based file watching
-- **Debounced Updates** - Reduced CPU usage for diagnostics
+- **LSP Handlers** - Suppress ESLint -32603 errors, optimized diagnostic handling
+- **Debounced Updates** - 150ms debounce on text changes for JS/TS and Kotlin
+- **Capabilities** - Incremental sync and snippet support enabled
 
 ---
 
@@ -276,7 +288,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Credits
 
-- [NvChad](https://github.com/NvChad/NvChad) - The base configuration
+- [NvChad](https://github.com/NvChad/NvChad) - Base configuration (forked from)
 - [LazyVim Starter](https://github.com/LazyVim/starter) - Inspiration for structure
 - [Neovim](https://neovim.io/) - The best editor ever
 
