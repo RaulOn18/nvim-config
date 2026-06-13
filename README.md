@@ -20,6 +20,7 @@ A **modern, modular, and blazing-fast** Neovim configuration forked from [NvChad
 - 🌳 **File Explorer** - Oil.nvim for buffer-like file editing
 - 🔍 **Fuzzy Finder** - Telescope with ripgrep integration
 - 🤖 **AI Assistant** - Augment AI integration for code assistance
+- 🎯 **Kotlin Support** - JetBrains kotlin-lsp via kotlin.nvim for Android/Compose development
 - 📦 **Auto-formatting** - Conform.nvim with Prettier, biome, and more
 
 ---
@@ -235,7 +236,7 @@ map("n", "<leader>xx", "<cmd>MyCommand<cr>", { desc = "My description" })
 | Go | ✅ gopls | ✅ gofmt/gofumpt | ✅ delve |
 | Python | ✅ pyright | ✅ black | ✅ debugpy |
 | Flutter/Dart | ✅ dartls | ✅ dart_format | ✅ flutter-tools |
-| Kotlin/Android | ✅ kotlin_language_server | ✅ ktlint | ✅ kotlin-debug-adapter |
+| Kotlin/Android | ✅ kotlin-lsp (JetBrains) | ✅ ktlint | ✅ kotlin-debug-adapter |
 | SQL | ✅ sqlls | ✅ sql-formatter | ❌ |
 | CSS/SCSS | ✅ cssls | ✅ prettier | ❌ |
 | HTML | ✅ html | ✅ prettier | ❌ |

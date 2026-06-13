@@ -45,6 +45,7 @@ lua/
     ai.lua                   # AI assistants
     debug.lua                # DAP debugging
     flutter.lua              # Flutter support
+    kotlin.lua               # Kotlin/Android (kotlin.nvim + kotlin-lsp)
     markdown.lua             # Markdown support
     sql.lua                  # SQL editor support
   utils/
