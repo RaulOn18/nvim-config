@@ -19,6 +19,17 @@ return {
         dotfiles = false,
         custom = {},
       },
+      filesystem_watchers = {
+        enable = true,
+        ignore_dirs = {
+          ".next",
+          "node_modules",
+          ".git",
+          "dist",
+          "build",
+          "target",
+        },
+      },
       git = {
         enable = false,
         ignore = false,
