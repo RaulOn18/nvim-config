@@ -112,7 +112,26 @@ return {
             map("n", "<leader>FR", "<cmd>FlutterRestart<cr>", { desc = "Flutter Restart", buffer = bufnr })
             map("n", "<leader>Fq", "<cmd>FlutterQuit<cr>", { desc = "Flutter Quit", buffer = bufnr })
             map("n", "<leader>Fc", "<cmd>FlutterReload<cr>", { desc = "Hot Reload", buffer = bufnr })
-            map("n", "<leader>Ft", "<cmd>Telescope flutter commands<cr>", { desc = "Flutter Commands", buffer = bufnr })
+            map("n", "<leader>Ft", function()
+  local fzf = require("fzf-lua")
+  local commands = {
+    "FlutterRun", "FlutterRestart", "FlutterReload", "FlutterQuit",
+    "FlutterDetach", "FlutterEmulators", "FlutterDevices",
+    "FlutterOutline", "FlutterDevTools", "FlutterCopyProfilerUrl",
+    "FlutterPubGet", "FlutterPubUpgrade", "FlutterLspRestart",
+    "FlutterSuperUpdateImports",
+  }
+  fzf.fzf_exec(commands, {
+    prompt = "Flutter Commands> ",
+    actions = {
+      ["default"] = function(selected)
+        if selected and #selected > 0 then
+          vim.cmd(selected[1])
+        end
+      end,
+    },
+  })
+end, { desc = "Flutter Commands (fzf)", buffer = bufnr })
 
             -- Document Colors (Neovim 0.12+)
             local ok_color, _ = pcall(vim.lsp.document_color.enable, true, { bufnr = bufnr })
@@ -140,7 +159,7 @@ return {
         },
       }
 
-      -- NOTE: flutter telescope extension removed (migrated to fzf-lua)
+      -- NOTE: all flutter commands now use fzf-lua (no telescope dependency)
     end,
   },
 }

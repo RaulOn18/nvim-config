@@ -1,5 +1,20 @@
 require "nvchad.mappings"
 
+-- Override NvChad's Telescope mappings with fzf-lua
+local map = vim.keymap.set
+local fzf = function(fn) return function() require("fzf-lua")[fn]() end end
+
+map("n", "<leader>fw", fzf "live_grep", { desc = "Live Grep (fzf)" })
+map("n", "<leader>fb", fzf "buffers", { desc = "Find Buffers (fzf)" })
+map("n", "<leader>fh", fzf "helptags", { desc = "Find Help (fzf)" })
+map("n", "<leader>ff", fzf "files", { desc = "Find Files (fzf)" })
+map("n", "<leader>fo", fzf "oldfiles", { desc = "Recent Files (fzf)" })
+map("n", "<leader>fz", fzf "builtin", { desc = "FzfLua Builtin" })
+map("n", "<leader>cm", function()
+  require("neogit").open({ "commit" })
+end, { desc = "Git Commit (Neogit)" })
+map("n", "<leader>gt", fzf "git_status", { desc = "Git Status (fzf)" })
+
 -- add yours here
 
 local map = vim.keymap.set
@@ -138,16 +153,11 @@ map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })
 map("n", "<leader>fp", function() require("utils.project").project_picker() end, { desc = "Find Projects" })
 map("n", "<leader>cd", function() require("utils.project").auto_cd_git_root() end, { desc = "CD to Git Root" })
 
--- fzf-lua shortcuts
-map("n", "<leader>ff", function() require("fzf-lua").files() end, { desc = "Find Files" })
-map("n", "<leader>fg", function() require("fzf-lua").live_grep() end, { desc = "Live Grep" })
-map("n", "<leader>fb", function() require("fzf-lua").buffers() end, { desc = "Find Buffers" })
-map("n", "<leader>fh", function() require("fzf-lua").helptags() end, { desc = "Find Help" })
-map("n", "<leader>fo", function() require("fzf-lua").oldfiles() end, { desc = "Recent Files" })
-map("n", "<leader>fc", function() require("fzf-lua").grep_cword() end, { desc = "Find String Under Cursor" })
-map("n", "<leader>fr", function() require("fzf-lua").resume() end, { desc = "Resume Last Search" })
-map("n", "<leader>fk", function() require("fzf-lua").keymaps() end, { desc = "Find Keymaps" })
-map("n", "<leader>fC", function() require("fzf-lua").commands() end, { desc = "Find Commands" })
+-- fzf-lua shortcuts (additional, not overriding NvChad)
+map("n", "<leader>fc", fzf "grep_cword", { desc = "Find String Under Cursor" })
+map("n", "<leader>fr", fzf "resume", { desc = "Resume Last Search" })
+map("n", "<leader>fk", fzf "keymaps", { desc = "Find Keymaps" })
+map("n", "<leader>fC", fzf "commands", { desc = "Find Commands" })
 
 -- Diagnostics (fzf-lua)
 map("n", "<leader>xx", function() require("fzf-lua").diagnostics_workspace() end, { desc = "All Diagnostics" })
