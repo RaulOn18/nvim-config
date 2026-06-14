@@ -140,9 +140,7 @@ return {
         },
       }
 
-      -- Load Telescope Extension
-      local ok, telescope = pcall(require, "telescope")
-      if ok then telescope.load_extension "flutter" end
+      -- NOTE: flutter telescope extension removed (migrated to fzf-lua)
     end,
   },
 }

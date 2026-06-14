@@ -62,129 +62,69 @@ return {
     },
   },
 
-  -- Better grep with ripgrep integration
+  -- Fuzzy finder: fzf-lua (faster than telescope, uses native fzf binary)
   {
-    "nvim-telescope/telescope.nvim",
+    "ibhagwan/fzf-lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
-      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
-      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
-      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Find Buffers" },
-      { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Find Help" },
-      { "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files" },
-      { "<leader>fc", "<cmd>Telescope grep_string<cr>", desc = "Find String Under Cursor" },
-      { "<leader>fr", "<cmd>Telescope resume<cr>", desc = "Resume Last Search" },
-      { "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find Keymaps" },
-      { "<leader>fC", "<cmd>Telescope commands<cr>", desc = "Find Commands" },
+      { "<leader>ff", function() require("fzf-lua").files() end, desc = "Find Files" },
+      { "<leader>fg", function() require("fzf-lua").live_grep() end, desc = "Live Grep" },
+      { "<leader>fb", function() require("fzf-lua").buffers() end, desc = "Find Buffers" },
+      { "<leader>fh", function() require("fzf-lua").helptags() end, desc = "Find Help" },
+      { "<leader>fo", function() require("fzf-lua").oldfiles() end, desc = "Recent Files" },
+      { "<leader>fc", function() require("fzf-lua").grep_cword() end, desc = "Find String Under Cursor" },
+      { "<leader>fr", function() require("fzf-lua").resume() end, desc = "Resume Last Search" },
+      { "<leader>fk", function() require("fzf-lua").keymaps() end, desc = "Find Keymaps" },
+      { "<leader>fC", function() require("fzf-lua").commands() end, desc = "Find Commands" },
+      { "<leader>fz", function() require("fzf-lua").builtin() end, desc = "FzfLua Builtin" },
+      { "<leader>fd", function() require("fzf-lua").diagnostics_workspace() end, desc = "Diagnostics" },
+      { "<leader>fw", function() require("fzf-lua").grep_cword() end, desc = "Grep Word Under Cursor" },
+      { "<leader>fW", function() require("fzf-lua").grep_cWORD() end, desc = "Grep WORD Under Cursor" },
     },
-    dependencies = {
-      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-      "nvim-telescope/telescope-ui-select.nvim",
+    ---@module "fzf-lua"
+    ---@type fzf-lua.Config|{}
+    ---@diagnostic disable: missing-fields
+    opts = {
+      { "fzf-native", "hide" },
+      winopts = {
+        height = 0.85,
+        width = 0.87,
+        preview = {
+          layout = "flex",
+          horizontal = "right:55%",
+          flip_columns = 120,
+          scrollbar = "float",
+        },
+      },
+      -- Path display: show filename first for faster scanning
+      path_display = { "filename_first" },
+      files = {
+        cwd_prompt = false,
+        file_ignore_patterns = { "node_modules", "%.git", "%.next", "dist", "build", "target", "%.lock" },
+        -- Use fd for faster file listing
+        fd_opts = "--color=never --type f --hidden --follow --exclude .git --exclude node_modules --exclude .next --exclude dist --exclude build --exclude target",
+      },
+      grep = {
+        rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e",
+        -- Limit grep results for speed on large repos
+        rg_glob = true,
+      },
+      -- Bat theme matching gruvchad
+      previewers = {
+        bat = {
+          theme = "gruvbox-dark",
+        },
+      },
+      -- Register as vim.ui.select backend
+      ui_select = true,
+      -- fzf binary options for max performance
+      fzf_opts = {
+        ["--history"] = vim.fn.stdpath("data") .. "/fzf-lua-history",
+      },
     },
-    opts = function(_, opts)
-      local actions = require("telescope.actions")
-
-      -- Open file with path that handles parentheses (Next.js route groups)
-      -- Works on both Windows and Linux
-      local function open_file(prompt_bufnr)
-        local entry = require("telescope.actions.state").get_selected_entry()
-        if entry and entry.path then
-          actions.close(prompt_bufnr)
-          local path = entry.path
-          -- Windows needs backslash separator
-          if vim.fn.has("win32") == 1 then
-            path = path:gsub("/", "\\")
-          end
-          -- Escape parentheses for Next.js route groups
-          path = path:gsub("%(", "\\%("):gsub("%)", "\\%)")
-          vim.cmd("edit " .. path)
-          -- Jump to match position (line + col) for grep results
-          if entry.lnum then
-            local lnum = entry.lnum
-            local col = (entry.col and entry.col > 0) and (entry.col - 1) or 0
-            vim.api.nvim_win_set_cursor(0, { lnum, col })
-            vim.cmd("normal! zz")
-          end
-        else
-          -- For non-file entries (code actions, etc), use default select action
-          actions.select_default(prompt_bufnr)
-        end
-      end
-      
-      opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
-        prompt_prefix = " ",
-        selection_caret = "  ",
-        path_display = { "truncate" },
-        sorting_strategy = "ascending",
-        layout_config = {
-          horizontal = {
-            prompt_position = "top",
-            preview_width = 0.55,
-            results_width = 0.8,
-          },
-          vertical = {
-            mirror = false,
-          },
-          width = 0.87,
-          height = 0.80,
-          preview_cutoff = 120,
-        },
-        file_ignore_patterns = {
-          "node_modules",
-          ".git",
-          ".next",
-          "dist",
-          "build",
-          "target",
-          "%.lock",
-        },
-        mappings = {
-          i = {
-            ["<C-n>"] = actions.cycle_history_next,
-            ["<C-p>"] = actions.cycle_history_prev,
-            ["<C-j>"] = actions.move_selection_next,
-            ["<C-k>"] = actions.move_selection_previous,
-            ["<C-c>"] = actions.close,
-            ["<CR>"] = open_file,
-            ["<C-x>"] = actions.select_horizontal,
-            ["<C-v>"] = actions.select_vertical,
-            ["<C-t>"] = actions.select_tab,
-            ["<C-u>"] = actions.preview_scrolling_up,
-            ["<C-d>"] = actions.preview_scrolling_down,
-            ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
-            ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-          },
-          n = {
-            ["q"] = actions.close,
-            ["<CR>"] = open_file,
-            ["<C-x>"] = actions.select_horizontal,
-            ["<C-v>"] = actions.select_vertical,
-            ["<C-t>"] = actions.select_tab,
-            ["j"] = actions.move_selection_next,
-            ["k"] = actions.move_selection_previous,
-            ["gg"] = actions.move_to_top,
-            ["G"] = actions.move_to_bottom,
-          },
-        },
-      })
-      
-      opts.extensions = {
-        fzf = {
-          fuzzy = true,
-          override_generic_sorter = true,
-          override_file_sorter = true,
-          case_mode = "smart_case",
-        },
-        ["ui-select"] = {
-          require("telescope.themes").get_dropdown({}),
-        },
-      }
-      
-      return opts
-    end,
+    ---@diagnostic enable: missing-fields
     config = function(_, opts)
-      require("telescope").setup(opts)
-      require("telescope").load_extension("fzf")
-      require("telescope").load_extension("ui-select")
+      require("fzf-lua").setup(opts)
     end,
   },
 
@@ -222,6 +162,6 @@ return {
     },
   },
 
-  -- Diagnostics: use Telescope (faster, already loaded)
+  -- Diagnostics: use fzf-lua (faster, already loaded)
   -- <leader>xx and <leader>xb mapped in mappings.lua
 }

@@ -20,11 +20,6 @@ return {
     },
     config = function(_, opts)
       require("project_nvim").setup(opts)
-      
-      local telescope_ok, telescope = pcall(require, "telescope")
-      if telescope_ok then
-        telescope.load_extension("projects")
-      end
     end,
   },
 

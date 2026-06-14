@@ -4,7 +4,7 @@
 return {
   { import = "plugins.core" },      -- LSP, formatter, treesitter
   { import = "plugins.git" },       -- Git integration
-  { import = "plugins.navigation" }, -- File explorer, telescope, search
+  { import = "plugins.navigation" }, -- File explorer, fzf-lua, search
   { import = "plugins.editing" },   -- Mini plugins, editing enhancements
   { import = "plugins.ide" },       -- Project management, UI features
   { import = "plugins.ai" },        -- AI assistants
@@ -13,4 +13,9 @@ return {
   { import = "plugins.markdown" },  -- Markdown support
   { import = "plugins.sql" },       -- SQL editor support
   { import = "plugins.kotlin" },    -- Kotlin/Android/Compose support
+
+  -- Disable NvChad bundled telescope (replaced by fzf-lua)
+  { "nvim-telescope/telescope.nvim", enabled = false },
+  { "nvim-telescope/telescope-fzf-native.nvim", enabled = false },
+  { "nvim-telescope/telescope-ui-select.nvim", enabled = false },
 }

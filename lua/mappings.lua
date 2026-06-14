@@ -135,26 +135,26 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })
 
 -- Projects
-map("n", "<leader>fp", "<cmd>Telescope projects<cr>", { desc = "Find Projects" })
+map("n", "<leader>fp", function() require("utils.project").project_picker() end, { desc = "Find Projects" })
 map("n", "<leader>cd", function() require("utils.project").auto_cd_git_root() end, { desc = "CD to Git Root" })
 
--- Telescope shortcuts
-map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
-map("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", { desc = "Live Grep" })
-map("n", "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Find Buffers" })
-map("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", { desc = "Find Help" })
-map("n", "<leader>fo", "<cmd>Telescope oldfiles<cr>", { desc = "Recent Files" })
-map("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Find String Under Cursor" })
-map("n", "<leader>fr", "<cmd>Telescope resume<cr>", { desc = "Resume Last Search" })
-map("n", "<leader>fk", "<cmd>Telescope keymaps<cr>", { desc = "Find Keymaps" })
-map("n", "<leader>fC", "<cmd>Telescope commands<cr>", { desc = "Find Commands" })
+-- fzf-lua shortcuts
+map("n", "<leader>ff", function() require("fzf-lua").files() end, { desc = "Find Files" })
+map("n", "<leader>fg", function() require("fzf-lua").live_grep() end, { desc = "Live Grep" })
+map("n", "<leader>fb", function() require("fzf-lua").buffers() end, { desc = "Find Buffers" })
+map("n", "<leader>fh", function() require("fzf-lua").helptags() end, { desc = "Find Help" })
+map("n", "<leader>fo", function() require("fzf-lua").oldfiles() end, { desc = "Recent Files" })
+map("n", "<leader>fc", function() require("fzf-lua").grep_cword() end, { desc = "Find String Under Cursor" })
+map("n", "<leader>fr", function() require("fzf-lua").resume() end, { desc = "Resume Last Search" })
+map("n", "<leader>fk", function() require("fzf-lua").keymaps() end, { desc = "Find Keymaps" })
+map("n", "<leader>fC", function() require("fzf-lua").commands() end, { desc = "Find Commands" })
 
--- Diagnostics (Telescope - faster than trouble.nvim)
-map("n", "<leader>xx", "<cmd>Telescope diagnostics<cr>", { desc = "All Diagnostics" })
-map("n", "<leader>xb", "<cmd>Telescope diagnostics bufnr=0<cr>", { desc = "Buffer Diagnostics" })
-map("n", "<leader>xs", "<cmd>Telescope lsp_document_symbols<cr>", { desc = "Document Symbols" })
-map("n", "<leader>xl", "<cmd>Telescope lsp_references<cr>", { desc = "LSP References" })
-map("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Quickfix List" })
+-- Diagnostics (fzf-lua)
+map("n", "<leader>xx", function() require("fzf-lua").diagnostics_workspace() end, { desc = "All Diagnostics" })
+map("n", "<leader>xb", function() require("fzf-lua").diagnostics_document() end, { desc = "Buffer Diagnostics" })
+map("n", "<leader>xs", function() require("fzf-lua").lsp_document_symbols() end, { desc = "Document Symbols" })
+map("n", "<leader>xl", function() require("fzf-lua").lsp_references() end, { desc = "LSP References" })
+map("n", "<leader>xq", function() require("fzf-lua").quickfix() end, { desc = "Quickfix List" })
 
 -- LSP shortcuts (akan aktif saat LSP attach)
 -- gd = native jump (paling cepat)
@@ -178,20 +178,19 @@ map("n", "gD", function()
   end
 end, { desc = "Go to Declaration (or Definition)" })
 
--- <leader>gd = Telescope picker (kalau ada multiple results)
-map("n", "<leader>gD", "<cmd>Telescope lsp_definitions<cr>", { desc = "Definition (Picker)" })
+-- <leader>gd = fzf-lua picker (kalau ada multiple results)
+map("n", "<leader>gD", function() require("fzf-lua").lsp_definitions() end, { desc = "Definition (Picker)" })
 
--- gr = LSP References (Telescope, project-relative path)
+-- gr = LSP References (fzf-lua)
 map("n", "gr", function()
-  require("telescope.builtin").lsp_references({
-    path_display = { "truncate" },
-    layout_config = {
-      preview_width = 0.5,
+  require("fzf-lua").lsp_references({
+    winopts = {
+      preview = { horizontal = "right:50%" },
     },
   })
 end, { desc = "Find References" })
 
-map("n", "gI", "<cmd>Telescope lsp_implementations<cr>", { desc = "Go to Implementation" })
+map("n", "gI", function() require("fzf-lua").lsp_implementations() end, { desc = "Go to Implementation" })
 map("n", "gy", vim.lsp.buf.type_definition, { desc = "Go to Type Definition" })
 map({ "n", "v" }, "<leader>ca", function()
   vim.lsp.buf.code_action()

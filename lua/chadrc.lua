@@ -52,9 +52,7 @@ M.ui = {
     border_color = "grey_fg",
     selected_item_bg = "colored",
   },
-  telescope = {
-    style = "bordered",
-  },
+
 }
 
 -- Terminal configuration

@@ -73,18 +73,18 @@ return {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diff View" },
       { "<leader>gD", "<cmd>DiffviewClose<cr>", desc = "Close Diff View" },
       { "<leader>gh", "<cmd>DiffviewFileHistory<cr>", desc = "File History" },
-      { "<leader>gb", "<cmd>Telescope git_branches<cr>", desc = "Git Branches" },
-      { "<leader>gc", "<cmd>Telescope git_commits<cr>", desc = "Git Commits" },
-      { "<leader>gs", "<cmd>Telescope git_status<cr>", desc = "Git Status" },
+      { "<leader>gb", function() require("fzf-lua").git_branches() end, desc = "Git Branches" },
+      { "<leader>gc", function() require("fzf-lua").git_commits() end, desc = "Git Commits" },
+      { "<leader>gs", function() require("fzf-lua").git_status() end, desc = "Git Status" },
     },
     dependencies = {
       "nvim-lua/plenary.nvim",
       "sindrets/diffview.nvim",
-      "nvim-telescope/telescope.nvim",
+      "ibhagwan/fzf-lua",
     },
     opts = {
       integrations = {
-        telescope = true,
+        fzf_lua = true,
         diffview = true,
       },
     },
