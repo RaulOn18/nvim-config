@@ -34,6 +34,20 @@ vim.lsp.handlers["textDocument/diagnostic"] = function(err, result, ctx, config)
   end
 end
 
+-- Suppress vtsls codeAction/resolve errors (TypeScript 5.9.x bug)
+-- Fzf-lua catches resolve errors internally and shows them via vim.notify,
+-- so we also filter those notifications below.
+local orig_code_action_resolve = vim.lsp.handlers["codeAction/resolve"]
+vim.lsp.handlers["codeAction/resolve"] = function(err, result, ctx, config)
+  if err then
+    return
+  end
+  if orig_code_action_resolve then
+    return orig_code_action_resolve(err, result, ctx, config)
+  end
+end
+
+
 function M.setup_lsp(name, config)
   config.name = name
   config.capabilities = capabilities

@@ -126,6 +126,11 @@ return {
       },
       -- Register as vim.ui.select backend
       ui_select = true,
+      -- Disable code action previewer: vtsls 5.9.x crashes on codeAction/resolve
+      -- with "Expected to find a range to extract" / "Expected applicable refactor info"
+      lsp = {
+        code_actions = { previewer = false },
+      },
     },
     ---@diagnostic enable: missing-fields
     config = function(_, opts)
