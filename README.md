@@ -102,8 +102,6 @@ Lazy.nvim will automatically install all plugins on first run.
 │   │   ├── kotlin.lua        # Kotlin/Android support
 │   │   ├── markdown.lua      # Markdown support
 │   │   └── sql.lua           # SQL editor support
-│   └── utils/
-│       └── project.lua       # Project management utilities
 ```
 
 ---
@@ -162,7 +160,6 @@ Lazy.nvim will automatically install all plugins on first run.
 | `<leader>fg` | Live grep |
 | `<leader>fb` | Buffers |
 | `<leader>fh` | Help tags |
-| `<leader>fp` | Projects |
 
 ### Debug (DAP)
 
