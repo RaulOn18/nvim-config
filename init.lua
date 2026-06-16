@@ -64,14 +64,3 @@ require "autocmds"
 vim.schedule(function()
   require "mappings"
 end)
-
--- Basic settings
-vim.opt.relativenumber = true
-vim.opt.number = true
-
--- Shell: auto-detect for Linux/Windows
-if vim.fn.has("unix") == 1 then
-  vim.o.shell = "/bin/bash"
-else
-  vim.o.shell = "pwsh"
-end

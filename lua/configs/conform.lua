@@ -59,17 +59,7 @@ local options = {
         "$FILENAME",
       },
       stdin = true,
-      -- fallback: try ktlint if ktfmt not found
-      condition = function(self, ctx)
-        return vim.fn.executable("ktfmt") == 1
-      end,
     },
-    ktlint = {
-      command = "ktlint",
-      args = { "--format", "--stdin" },
-      stdin = true,
-    },
-    -- clang-format uses .clang-format from project root, falls back to LLVM style
     clang_format = {
       command = "clang-format",
       args = { "--style=file", "--fallback-style=LLVM" },

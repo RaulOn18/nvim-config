@@ -16,16 +16,10 @@ M.find_git_root = function()
   return toplevel
 end
 
--- Fzf-lua projects picker
+-- Project picker (vim.ui.select, backed by Telescope via ui_select)
 M.project_picker = function()
-  local fzf_ok, fzf = pcall(require, "fzf-lua")
-  if not fzf_ok then
-    vim.notify("fzf-lua not loaded", vim.log.levels.WARN)
-    return
-  end
-  -- Use project.nvim's history via fzf-lua
-  local project_ok, project = pcall(require, "project_nvim")
-  if not project_ok then
+  local ok = pcall(require, "project_nvim")
+  if not ok then
     vim.notify("project.nvim not loaded", vim.log.levels.WARN)
     return
   end
@@ -35,17 +29,12 @@ M.project_picker = function()
     vim.notify("No recent projects found", vim.log.levels.INFO)
     return
   end
-  fzf.fzf_exec(projects, {
-    prompt = "Projects> ",
-    actions = {
-      ["default"] = function(selected)
-        if selected and #selected > 0 then
-          vim.cmd("cd " .. selected[1])
-          vim.notify("Changed to: " .. selected[1], vim.log.levels.INFO)
-        end
-      end,
-    },
-  })
+  vim.ui.select(projects, { prompt = "Projects" }, function(choice)
+    if choice then
+      vim.cmd("cd " .. choice)
+      vim.notify("Changed to: " .. choice, vim.log.levels.INFO)
+    end
+  end)
 end
 
 -- Auto change directory to git root

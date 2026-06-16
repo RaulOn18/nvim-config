@@ -14,9 +14,4 @@ return {
   { import = "plugins.sql" },       -- SQL editor support
   { import = "plugins.c" },         -- C/C++: clangd, clang-format, codelldb
   { import = "plugins.kotlin" },    -- Kotlin/Android/Compose support
-
-  -- Disable NvChad bundled telescope (replaced by fzf-lua)
-  { "nvim-telescope/telescope.nvim", enabled = false },
-  { "nvim-telescope/telescope-fzf-native.nvim", enabled = false },
-  { "nvim-telescope/telescope-ui-select.nvim", enabled = false },
 }

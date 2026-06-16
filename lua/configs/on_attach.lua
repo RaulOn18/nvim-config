@@ -4,32 +4,29 @@
 local M = {}
 
 -- Per-server on_attach overrides (keyed by server name)
--- Set to a function(client, bufnr) for custom behaviour
-M.server_overrides = {
-  -- vtsls: also disable codeLens + semantic tokens
-  vtsls = function(client, bufnr)
-    client.server_capabilities.codeLensProvider = false
-    client.server_capabilities.semanticTokensProvider = nil
+local PER_SERVER = {
+  vtsls = function(c)
+    c.server_capabilities.codeLensProvider = false
+    c.server_capabilities.semanticTokensProvider = nil
   end,
-  -- eslint: enable formatting (it provides code actions + fixes)
-  eslint = function(client, bufnr)
-    client.server_capabilities.documentFormattingProvider = true
+  eslint = function(c)
+    c.server_capabilities.documentFormattingProvider = true
   end,
-  -- kotlin-lsp: disable semantic tokens (heavy, slow on large projects)
-  kotlin_lsp = function(client, bufnr)
-    client.server_capabilities.semanticTokensProvider = nil
+  kotlin_lsp = function(c)
+    c.server_capabilities.semanticTokensProvider = nil
   end,
-  -- gopls: disable formatting (conform handles gofumpt + goimports)
-  gopls = function(client, bufnr)
-    client.server_capabilities.documentFormattingProvider = false
-    client.server_capabilities.documentRangeFormattingProvider = false
-    -- semantic tokens already off via settings, but force nil
-    client.server_capabilities.semanticTokensProvider = nil
+  gopls = function(c)
+    c.server_capabilities.documentFormattingProvider = false
+    c.server_capabilities.documentRangeFormattingProvider = false
+    c.server_capabilities.semanticTokensProvider = nil
   end,
-  -- clangd: heavy on large codebases, disable semantic tokens (clangd ships its own)
-  clangd = function(client, bufnr)
-    client.server_capabilities.semanticTokensProvider = nil
-    -- inlayHints controlled by clangd setting + vim.lsp.inlay_hint.enable() if needed
+  clangd = function(c)
+    c.server_capabilities.semanticTokensProvider = nil
+  end,
+  sqlls = function(c)
+    c.server_capabilities.completionProvider = {
+      triggerCharacters = { ".", " ", "(" },
+    }
   end,
 }
 
@@ -48,10 +45,9 @@ function M.on_attach(client, bufnr)
   -- vim/lsp/document_color.lua:225 when client advertises the capability)
   client.server_capabilities.documentColorProvider = nil
 
-  -- Per-server override
-  local override = M.server_overrides[client.name]
+  local override = PER_SERVER[client.name]
   if override then
-    override(client, bufnr)
+    override(client)
   end
 end
 

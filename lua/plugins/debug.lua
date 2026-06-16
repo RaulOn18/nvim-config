@@ -215,23 +215,7 @@ return {
         dap.configurations.cpp = c_cfgs
       end
 
-      -- Android (adb via Mason)
-      -- For Android debugging, use gradle + adb directly
-      -- or install android-debug-adapter via Mason if available
-      -- Common adb commands:
-      --   adb devices - list connected devices
-      --   adb install -r app.apk - install APK
-      --   adb logcat - view logs
-      --   adb shell am start - launch app
-      --
-      -- Android debug workflow:
-      -- 1. <leader>Ka - assembleDebug (build APK)
-      -- 2. <leader>Ki - installDebug (install to device)
-      -- 3. <leader>KD - list devices
-      -- 4. <leader>KL - logcat
-      -- 5. <leader>dc - start debug session
-
-      -- Signs on first session
+  -- DAP UI
 
       dap.listeners.after.event_initialized["lazy_signs"] = ensure_signs
     end

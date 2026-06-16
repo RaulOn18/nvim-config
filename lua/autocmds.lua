@@ -1,14 +1,9 @@
 require "nvchad.autocmds"
 
--- Node.js/Next.js Performance Autocmds
 local autocmd = vim.api.nvim_create_autocmd
 local augroup = vim.api.nvim_create_augroup
 
--- Preserve window proportions when NvimTree opens/closes
--- DISABLED: causes performance issues
--- local nvimtree_group = augroup("NvimTreeResize", { clear = true })
-
--- Group untuk Node.js optimizations
+-- Node.js/Next.js Performance Autocmds
 local nodejs_group = augroup("NodeJSOptimizations", { clear = true })
 
 -- Disable formatting for node_modules
@@ -67,6 +62,18 @@ autocmd({ "BufRead", "BufNewFile" }, {
 -- ============================================
 local c_group = augroup("CFiletypeSettings", { clear = true })
 
+-- GCC/Clang/MSVC errorformat for :make + quickfix
+local C_ERRORFORMAT = table.concat({
+  "%f:%l:%c: %trror: %m",
+  "%f:%l:%c: %tarning: %m",
+  "%f:%l:%c: %tote: %m",
+  "%f:%l: %trror: %m",
+  "%f:%l: %tarning: %m",
+  "%f(%l): %trror: %m",       -- MSVC cl.exe
+  "%f(%l,%c): %trror: %m",    -- MSVC alternative
+  "%f:%l: %m",
+}, ",")
+
 autocmd("FileType", {
   group = c_group,
   pattern = { "c", "cpp" },
@@ -80,17 +87,7 @@ autocmd("FileType", {
     elseif vim.fn.filereadable(cwd .. "/Makefile") == 1 then
       vim.opt_local.makeprg = "make"
     end
-    -- GCC/Clang/MSVC errorformat for :make + quickfix
-    vim.opt_local.errorformat = table.concat({
-      "%f:%l:%c: %trror: %m",
-      "%f:%l:%c: %tarning: %m",
-      "%f:%l:%c: %tote: %m",
-      "%f:%l: %trror: %m",
-      "%f:%l: %tarning: %m",
-      "%f(%l): %trror: %m",       -- MSVC cl.exe
-      "%f(%l,%c): %trror: %m",    -- MSVC alternative
-      "%f:%l: %m",
-    }, ",")
+    vim.opt_local.errorformat = C_ERRORFORMAT
   end,
 })
 
@@ -104,5 +101,45 @@ autocmd({ "BufRead", "BufNewFile" }, {
     vim.opt_local.buflisted = false
   end,
 })
+
+-- ============================================
+-- KOTLIN/ANDROID
+-- ============================================
+local kotlin_group = augroup("KotlinFiletypeSettings", { clear = true })
+
+autocmd("FileType", {
+  group = kotlin_group,
+  pattern = "kotlin",
+  callback = function()
+    -- Android convention: 4 spaces, no wrap, // comments
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.softtabstop = 4
+    vim.opt_local.expandtab = true
+    vim.opt_local.wrap = false
+    vim.bo.commentstring = "// %s"
+    -- Use project-local gradle wrapper when present
+    local cwd = vim.fn.getcwd()
+    local gradlew = cwd .. "/" .. (vim.fn.has("win32") == 1 and "gradlew.bat" or "gradlew")
+    if vim.fn.filereadable(gradlew) == 1 then
+      vim.env.GRADLE_HOME = cwd
+    end
+  end,
+})
+
+-- Android SDK: set ANDROID_HOME if not already set
+if vim.env.ANDROID_HOME == nil and vim.env.ANDROID_SDK_ROOT == nil then
+  local home = vim.env.HOME or vim.env.USERPROFILE or ""
+  for _, path in ipairs {
+    home .. "/AppData/Local/Android/Sdk",
+    home .. "/Library/Android/sdk",
+    home .. "/Android/Sdk",
+  } do
+    if vim.fn.isdirectory(path) == 1 then
+      vim.env.ANDROID_HOME = path
+      break
+    end
+  end
+end
 
 

@@ -14,12 +14,7 @@ return {
     },
     config = function()
       local on_attach = require "configs.on_attach"
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities.textDocument.completion.completionItem.snippetSupport = true
-      local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-      if ok_cmp then
-        capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
-      end
+      local capabilities = require "configs.capabilities"
 
       require("kotlin").setup {
         -- Root markers for Android/Gradle projects
@@ -47,20 +42,10 @@ return {
         -- LSP config: force cmp capabilities + shared on_attach
         lsp = {
           on_attach = on_attach.on_attach,
-          capabilities = capabilities,
+          capabilities = capabilities.default,
         },
       }
     end,
-  },
-
-  -- Ensure kotlin-lsp is installed via Mason
-  {
-    "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "kotlin-lsp",
-      },
-    },
   },
 
   -- Gradle build file syntax (keep for highlighting)

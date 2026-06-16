@@ -1,153 +1,31 @@
--- LSP Configuration
--- Using vim.lsp.start() for Neovim 0.12+
+-- LSP configuration: Neovim 0.12+ native vim.lsp.enable
+-- Replaces custom M.setup_lsp (root cache, ft_set, root_uri/workspace_folders dance)
+-- that re-implemented what vim.lsp.enable provides natively.
 
-local M = {}
 local on_attach = require "configs.on_attach"
+local capabilities = require "configs.capabilities"
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-
--- Merge cmp_nvim_lsp capabilities (better completion support)
-local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-if ok_cmp then
-  capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
-end
-
--- Suppress ESLint -32603 errors globally (Windows path handling bug)
-local orig_publish = vim.lsp.handlers["textDocument/publishDiagnostics"]
-vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
-  if err and err.code == -32603 then
-    return
-  end
-  if orig_publish then
-    return orig_publish(err, result, ctx, config)
+-- Suppress noisy notifications:
+--   -32603 on publishDiagnostics / diagnostic = ESLint Windows path-handling bug
+--   any err on codeAction/resolve              = vtsls TypeScript 5.9.x bug
+local function silent_on(method, code)
+  local orig = vim.lsp.handlers[method]
+  vim.lsp.handlers[method] = function(err, result, ctx, config)
+    if err and (not code or err.code == code) then return end
+    if orig then return orig(err, result, ctx, config) end
   end
 end
+silent_on("textDocument/publishDiagnostics", -32603)
+silent_on("textDocument/diagnostic", -32603)
+silent_on("codeAction/resolve")
 
-local orig_diagnostic = vim.lsp.handlers["textDocument/diagnostic"]
-vim.lsp.handlers["textDocument/diagnostic"] = function(err, result, ctx, config)
-  if err and err.code == -32603 then
-    return
-  end
-  if orig_diagnostic then
-    return orig_diagnostic(err, result, ctx, config)
-  end
-end
+-- Global defaults applied to every LSP
+vim.lsp.config["*"] = vim.tbl_extend("force", vim.lsp.config["*"] or {}, {
+  on_attach = on_attach.on_attach,
+  capabilities = capabilities.default,
+})
 
--- Suppress vtsls codeAction/resolve errors (TypeScript 5.9.x bug)
--- Fzf-lua catches resolve errors internally and shows them via vim.notify,
--- so we also filter those notifications below.
-local orig_code_action_resolve = vim.lsp.handlers["codeAction/resolve"]
-vim.lsp.handlers["codeAction/resolve"] = function(err, result, ctx, config)
-  if err then
-    return
-  end
-  if orig_code_action_resolve then
-    return orig_code_action_resolve(err, result, ctx, config)
-  end
-end
-
-
-function M.setup_lsp(name, config)
-  config.name = name
-  config.capabilities = capabilities
-
-  if not config.on_attach then
-    config.on_attach = on_attach.on_attach
-  end
-
-  -- Store config for later use
-  M.configs = M.configs or {}
-  M.configs[name] = config
-
-  -- Create autocmd to start LSP when file is opened
-  if config.filetypes then
-    local group = vim.api.nvim_create_augroup("LspStart_" .. name, { clear = true })
-
-    -- Cache root_dir lookups per cwd to avoid repeated filesystem scans
-    local root_cache = {}
-
-    -- Pre-compute a set for O(1) filetype lookup instead of ipairs loop
-    local ft_set = {}
-    for _, f in ipairs(config.filetypes) do
-      ft_set[f] = true
-    end
-
-    vim.api.nvim_create_autocmd("FileType", {
-      pattern = config.filetypes,
-      callback = function(args)
-        local buf = args.buf
-        local ft = vim.bo[buf].filetype
-
-        if ft == "" then
-          vim.cmd("filetype detect")
-          ft = vim.bo[buf].filetype
-        end
-
-        -- Fast guard: should always match since pattern=, but be safe
-        if not ft_set[ft] then return end
-
-        -- Check if client already exists for this buffer
-        local clients = vim.lsp.get_clients({ name = name })
-        for _, client in ipairs(clients) do
-          if client.attached_buffers[buf] then
-            return
-          end
-        end
-
-        -- Get buffer path for root_dir calculation
-        local fname = vim.api.nvim_buf_get_name(buf)
-        if fname == "" then
-          -- No file path yet (new buffer), skip LSP start
-          return
-        end
-
-        -- Build config for this buffer (shallow copy — only root_dir/settings change)
-        local lsp_config = {}
-        for k, v in pairs(config) do
-          lsp_config[k] = v
-        end
-        if type(lsp_config.root_dir) == "function" then
-          local file_dir = vim.fn.fnamemodify(fname, ":h")
-          local cache_key = file_dir .. "::" .. name
-          
-          if root_cache[cache_key] ~= nil then
-            lsp_config.root_dir = root_cache[cache_key]
-          else
-            local root = lsp_config.root_dir(fname)
-            if not root or root == "" then
-              return
-            end
-            root_cache[cache_key] = root
-            lsp_config.root_dir = root
-          end
-        end
-
-        -- Ensure root_dir is a valid string path
-        if lsp_config.root_dir and type(lsp_config.root_dir) == "string" then
-          -- Convert to URI for vim.lsp.start()
-          lsp_config.root_uri = vim.uri_from_fname(lsp_config.root_dir)
-          lsp_config.workspace_folders = {
-            {
-              uri = lsp_config.root_uri,
-              name = vim.fn.fnamemodify(lsp_config.root_dir, ":t"),
-            },
-          }
-        end
-
-        -- Start LSP client
-        local client_id = vim.lsp.start(lsp_config)
-        if client_id then
-          vim.lsp.buf_attach_client(buf, client_id)
-        end
-      end,
-      group = group,
-    })
-  end
-end
-
--- vtsls for TypeScript/JavaScript
-M.setup_lsp("vtsls", {
+vim.lsp.config.vtsls = {
   cmd = { "vtsls", "--stdio" },
   filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
   flags = {
@@ -159,7 +37,7 @@ M.setup_lsp("vtsls", {
       tsserver = {
         maxTsServerMemory = 3072,
         logVerbosity = "off",
-        useSyntaxServer = "never",  -- saves ~200MB; disable secondary syntax server
+        useSyntaxServer = "never",
       },
       suggest = {
         autoImports = false,
@@ -180,40 +58,30 @@ M.setup_lsp("vtsls", {
         includeCompletionsForModuleExports = false,
       },
     },
-    vtsls = {
-      autoUseWorkspaceTsdk = true,
-    },
+    vtsls = { autoUseWorkspaceTsdk = true },
   },
-  single_file_support = false,
-  -- override handled via on_attach module
-})
+}
 
--- ESLint
-M.setup_lsp("eslint", {
+vim.lsp.config.eslint = {
   cmd = { "vscode-eslint-language-server", "--stdio" },
   filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
-  root_dir = function(fname)
-    local util = require "lspconfig.util"
-    return util.root_pattern(
-      ".eslintrc",
-      ".eslintrc.js",
-      ".eslintrc.cjs",
-      ".eslintrc.yaml",
-      ".eslintrc.yml",
-      ".eslintrc.json",
-      "eslint.config.js",
-      "eslint.config.mjs",
-      "eslint.config.cjs",
-      "package.json"
-    )(fname)
-  end,
-  single_file_support = false,
+  root_markers = {
+    ".eslintrc",
+    ".eslintrc.js",
+    ".eslintrc.cjs",
+    ".eslintrc.yaml",
+    ".eslintrc.yml",
+    ".eslintrc.json",
+    "eslint.config.js",
+    "eslint.config.mjs",
+    "eslint.config.cjs",
+    "package.json",
+  },
   settings = {
     eslint = {
       quiet = true,
       validate = "probe",
       workingDirectory = { mode = "auto" },
-      -- Disable problematic diagnostics that trigger path errors
       problems = { shortenToSingleLine = false },
       codeAction = {
         disableRuleComment = { enable = true, location = "separateLine" },
@@ -221,32 +89,23 @@ M.setup_lsp("eslint", {
       },
     },
   },
-  handlers = {
-    ["eslint/probeFailed"] = function() return nil end,
-  },
-  -- override handled via on_attach module
-})
+}
 
--- Tailwind CSS
-M.setup_lsp("tailwindcss", {
+vim.lsp.config.tailwindcss = {
   cmd = { "tailwindcss-language-server", "--stdio" },
   filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact" },
-  root_dir = function(fname)
-    local util = require "lspconfig.util"
-    return util.root_pattern(
-      "tailwind.config.js",
-      "tailwind.config.cjs",
-      "tailwind.config.mjs",
-      "tailwind.config.ts",
-      "postcss.config.js",
-      "postcss.config.cjs",
-      "postcss.config.mjs",
-      "postcss.config.ts",
-      "package.json",
-      "tailwind.config.lua"
-    )(fname)
-  end,
-  single_file_support = false,
+  root_markers = {
+    "tailwind.config.js",
+    "tailwind.config.cjs",
+    "tailwind.config.mjs",
+    "tailwind.config.ts",
+    "postcss.config.js",
+    "postcss.config.cjs",
+    "postcss.config.mjs",
+    "postcss.config.ts",
+    "package.json",
+    "tailwind.config.lua",
+  },
   settings = {
     tailwindCSS = {
       includeLanguages = {
@@ -255,46 +114,34 @@ M.setup_lsp("tailwindcss", {
       },
     },
   },
-})
+}
 
--- HTML
-M.setup_lsp("html", {
+vim.lsp.config.html = {
   cmd = { "vscode-html-language-server", "--stdio" },
   filetypes = { "html" },
-})
+}
 
--- CSS
-M.setup_lsp("cssls", {
+vim.lsp.config.cssls = {
   cmd = { "vscode-css-language-server", "--stdio" },
   filetypes = { "css", "scss", "less" },
-})
+}
 
--- Go
-M.setup_lsp("gopls", {
+vim.lsp.config.gopls = {
   cmd = { "gopls" },
   filetypes = { "go", "gomod", "gowork", "gotmpl" },
   settings = {
     gopls = {
-      -- Memory: cap analyses memory usage
       analyses = {
-        unusedparams = false,   -- noisy, slow
-        unusedwrite = false,    -- noisy
+        unusedparams = false,
+        unusedwrite = false,
         unusedresult = false,
-        shadow = false,         -- slow on large files
-        nilness = false,        -- expensive flow analysis
-        fieldalignment = false, -- slow on large structs
+        shadow = false,
+        nilness = false,
+        fieldalignment = false,
       },
-      -- Staticcheck OFF: faster, fewer warnings (run separately if needed)
       staticcheck = false,
-      -- Semantic tokens OFF: big perf win, gopls is heavy
       semanticTokens = false,
-      -- No goimports auto-format (conform handles)
-      -- (goimports setting removed; not a valid gopls option here)
-      -- Completion: case-insensitive is faster
       matcher = "CaseInsensitive",
-      -- Use GOPATH cache
-      buildFlags = {},
-      -- Inlay hints OFF
       hints = {
         assignVariableTypes = false,
         compositeLiteralFields = false,
@@ -303,65 +150,47 @@ M.setup_lsp("gopls", {
         parameterNames = false,
         rangeOverFunction = false,
       },
-      -- No code lens (gopls default is on)
       codelenses = {
         references = false,
         implementation = false,
       },
     },
   },
-})
+}
 
--- C/C++: clangd
-M.setup_lsp("clangd", {
+vim.lsp.config.clangd = {
   cmd = { "clangd" },
   filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
-  root_dir = function(fname)
-    local util = require "lspconfig.util"
-    -- Prefer compile_commands.json (CMake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON, Meson, Bear)
-    -- Fallback to CMakeLists/Makefile/meson/.clangd/.git
-    return util.root_pattern(
-      "compile_commands.json",
-      "compile_flags.txt",
-      ".clangd",
-      "CMakeLists.txt",
-      "Makefile",
-      "meson.build",
-      ".git"
-    )(fname)
-  end,
-  single_file_support = true,
+  root_markers = {
+    "compile_commands.json",
+    "compile_flags.txt",
+    ".clangd",
+    "CMakeLists.txt",
+    "Makefile",
+    "meson.build",
+    ".git",
+  },
   flags = {
     debounce_text_changes = 200,
     allow_incremental_sync = true,
   },
   settings = {
     clangd = {
-      -- Fallback flags when no compile_commands.json (covers stdlib only)
       fallbackFlags = { "-std=c17" },
-      -- Inlay hints OFF by default; toggle per-buffer if needed
       inlayHints = { Enable = false },
-      -- Header insertion: IWYU style
       headerInsertion = "iwyu",
     },
   },
-})
+}
 
--- SQL
-M.setup_lsp("sqlls", {
+vim.lsp.config.sqlls = {
   cmd = { "sql-language-server", "up", "--method", "stdio" },
   filetypes = { "sql", "mysql" },
-  single_file_support = true,
-  on_attach = function(client, bufnr)
-    client.server_capabilities.completionProvider = {
-      triggerCharacters = { ".", " ", "(" },
-    }
-  end,
-})
+}
 
--- NOTE: Kotlin LSP is now handled by kotlin.nvim plugin
--- See lua/plugins/kotlin.lua for configuration
--- Old kotlin-language-server removed in favor of JetBrains official kotlin-lsp
+-- NOTE: Kotlin LSP is handled by kotlin.nvim plugin (see plugins/kotlin.lua)
+
+vim.lsp.enable { "vtsls", "eslint", "tailwindcss", "html", "cssls", "gopls", "clangd", "sqlls" }
 
 -- Diagnostic config
 vim.diagnostic.config {
@@ -379,5 +208,3 @@ vim.diagnostic.config {
     source = "always",
   },
 }
-
-return M

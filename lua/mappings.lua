@@ -1,23 +1,14 @@
 require "nvchad.mappings"
 
--- Override NvChad's Telescope mappings with fzf-lua
+-- Telescope (lazy-loaded on first use via NvChad defaults + custom keys below)
 local map = vim.keymap.set
-local fzf = function(fn) return function() require("fzf-lua")[fn]() end end
 
-map("n", "<leader>fw", fzf "live_grep", { desc = "Live Grep (fzf)" })
-map("n", "<leader>fb", fzf "buffers", { desc = "Find Buffers (fzf)" })
-map("n", "<leader>fh", fzf "helptags", { desc = "Find Help (fzf)" })
-map("n", "<leader>ff", fzf "files", { desc = "Find Files (fzf)" })
-map("n", "<leader>fo", fzf "oldfiles", { desc = "Recent Files (fzf)" })
-map("n", "<leader>fz", fzf "builtin", { desc = "FzfLua Builtin" })
 map("n", "<leader>cm", function()
   require("neogit").open({ "commit" })
 end, { desc = "Git Commit (Neogit)" })
-map("n", "<leader>gt", fzf "git_status", { desc = "Git Status (fzf)" })
+map("n", "<leader>gt", "<cmd>Telescope git_status<cr>", { desc = "Git Status" })
 
 -- add yours here
-
-local map = vim.keymap.set
 
 -- Override NvChad's <leader>x (buffer close) to go to previous buffer
 map("n", "<leader>x", function()
@@ -90,43 +81,7 @@ map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 -- Quick save
 map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>", { desc = "Save file" })
 
--- Buffer management: close and go to previous buffer
-map("n", "<leader>bd", function()
-  local cur = vim.api.nvim_get_current_buf()
-  -- Find previous buffer (most recently used)
-  local bufs = vim.fn.getbufinfo({ buflisted = 1 })
-  -- Sort by last used time (descending)
-  table.sort(bufs, function(a, b) return a.lastused > b.lastused end)
-  
-  -- Find the buffer that's not current
-  local target = nil
-  for _, buf in ipairs(bufs) do
-    if buf.bufnr ~= cur then
-      target = buf.bufnr
-      break
-    end
-  end
-  
-  if target then
-    vim.cmd("buffer " .. target)
-  else
-    -- No other buffer, open new empty
-    vim.cmd("enew")
-  end
-  
-  -- Delete the old buffer
-  if vim.bo[cur].modified then
-    local choice = vim.fn.confirm("Save changes to " .. vim.fn.bufname(cur) .. "?", "&Yes\n&No\n&Cancel", 2)
-    if choice == 1 then
-      vim.cmd("bdelete " .. cur)
-    elseif choice == 2 then
-      vim.cmd("bdelete! " .. cur)
-    end
-  else
-    vim.cmd("bdelete! " .. cur)
-  end
-end, { desc = "Close buffer (go to previous)" })
-
+-- Buffer management: close other buffers
 map("n", "<leader>bo", "<cmd>%bd|e#<cr>", { desc = "Close other buffers" })
 
 -- Window splits: close and go to previous window
@@ -153,18 +108,17 @@ map("n", "<leader>qQ", "<cmd>qa!<cr>", { desc = "Force quit all" })
 map("n", "<leader>fp", function() require("utils.project").project_picker() end, { desc = "Find Projects" })
 map("n", "<leader>cd", function() require("utils.project").auto_cd_git_root() end, { desc = "CD to Git Root" })
 
--- fzf-lua shortcuts (additional, not overriding NvChad)
-map("n", "<leader>fc", fzf "grep_cword", { desc = "Find String Under Cursor" })
-map("n", "<leader>fr", fzf "resume", { desc = "Resume Last Search" })
-map("n", "<leader>fk", fzf "keymaps", { desc = "Find Keymaps" })
-map("n", "<leader>fC", fzf "commands", { desc = "Find Commands" })
+map("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Find String Under Cursor" })
+map("n", "<leader>fr", "<cmd>Telescope resume<cr>", { desc = "Resume Last Search" })
+map("n", "<leader>fk", "<cmd>Telescope keymaps<cr>", { desc = "Find Keymaps" })
+map("n", "<leader>fC", "<cmd>Telescope commands<cr>", { desc = "Find Commands" })
 
--- Diagnostics (fzf-lua)
-map("n", "<leader>xx", function() require("fzf-lua").diagnostics_workspace() end, { desc = "All Diagnostics" })
-map("n", "<leader>xb", function() require("fzf-lua").diagnostics_document() end, { desc = "Buffer Diagnostics" })
-map("n", "<leader>xs", function() require("fzf-lua").lsp_document_symbols() end, { desc = "Document Symbols" })
-map("n", "<leader>xl", function() require("fzf-lua").lsp_references() end, { desc = "LSP References" })
-map("n", "<leader>xq", function() require("fzf-lua").quickfix() end, { desc = "Quickfix List" })
+-- Diagnostics (Telescope)
+map("n", "<leader>xx", "<cmd>Telescope diagnostics<cr>", { desc = "All Diagnostics" })
+map("n", "<leader>xb", "<cmd>Telescope diagnostics bufnr=0<cr>", { desc = "Buffer Diagnostics" })
+map("n", "<leader>xs", "<cmd>Telescope lsp_document_symbols<cr>", { desc = "Document Symbols" })
+map("n", "<leader>xl", "<cmd>Telescope lsp_references<cr>", { desc = "LSP References" })
+map("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", { desc = "Quickfix List" })
 
 -- LSP shortcuts (akan aktif saat LSP attach)
 -- gd = native jump (paling cepat)
@@ -188,25 +142,22 @@ map("n", "gD", function()
   end
 end, { desc = "Go to Declaration (or Definition)" })
 
--- <leader>gd = fzf-lua picker (kalau ada multiple results)
-map("n", "<leader>gD", function() require("fzf-lua").lsp_definitions() end, { desc = "Definition (Picker)" })
+-- <leader>gd = Telescope picker (kalau ada multiple results)
+map("n", "<leader>gD", "<cmd>Telescope lsp_definitions<cr>", { desc = "Definition (Picker)" })
 
--- gr = LSP References (fzf-lua)
+-- gr = LSP References (Telescope)
 map("n", "gr", function()
-  require("fzf-lua").lsp_references({
-    winopts = {
-      preview = { horizontal = "right:50%" },
-    },
+  require("telescope.builtin").lsp_references({
+    layout_config = { preview_width = 0.5 },
   })
 end, { desc = "Find References" })
 
-map("n", "gI", function() require("fzf-lua").lsp_implementations() end, { desc = "Go to Implementation" })
+map("n", "gI", "<cmd>Telescope lsp_implementations<cr>", { desc = "Go to Implementation" })
 map("n", "gy", vim.lsp.buf.type_definition, { desc = "Go to Type Definition" })
 map({ "n", "v" }, "<leader>ca", function()
   vim.lsp.buf.code_action()
 end, { desc = "Code Action" })
 map("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename Symbol" })
-map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 map("n", "<leader>cl", "<cmd>LspInfo<cr>", { desc = "LSP Info" })
 map("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
 map("n", "]d", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
