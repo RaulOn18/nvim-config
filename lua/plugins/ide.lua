@@ -10,7 +10,7 @@ return {
     opts = {
       manual_mode = true,
       detection_methods = { "pattern" },
-      patterns = { ".git", "package.json", "tsconfig.json", "Cargo.toml", "go.mod", ">_Makefile", "build.gradle.kts", "build.gradle", "settings.gradle.kts", "settings.gradle" },
+      patterns = { ".git", "package.json", "tsconfig.json", "Cargo.toml", "go.mod", ">_Makefile", "build.gradle.kts", "build.gradle", "settings.gradle.kts", "settings.gradle", "compile_commands.json", "CMakeLists.txt", "meson.build" },
       ignore_lsp = {},
       exclude_dirs = { "~/", "/tmp", "node_modules", ".git", "build", ".gradle", ".idea" },
       show_hidden = false,

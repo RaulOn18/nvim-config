@@ -62,4 +62,47 @@ autocmd({ "BufRead", "BufNewFile" }, {
   end,
 })
 
+-- ============================================
+-- C/C++ FILTYPE SETTINGS
+-- ============================================
+local c_group = augroup("CFiletypeSettings", { clear = true })
+
+autocmd("FileType", {
+  group = c_group,
+  pattern = { "c", "cpp" },
+  callback = function()
+    vim.opt_local.commentstring = "// %s"
+    -- :make integration: route to CMake/Make
+    local cwd = vim.fn.getcwd()
+    if vim.fn.filereadable(cwd .. "/compile_commands.json") == 1
+        or vim.fn.filereadable(cwd .. "/CMakeLists.txt") == 1 then
+      vim.opt_local.makeprg = "cmake --build build"
+    elseif vim.fn.filereadable(cwd .. "/Makefile") == 1 then
+      vim.opt_local.makeprg = "make"
+    end
+    -- GCC/Clang/MSVC errorformat for :make + quickfix
+    vim.opt_local.errorformat = table.concat({
+      "%f:%l:%c: %trror: %m",
+      "%f:%l:%c: %tarning: %m",
+      "%f:%l:%c: %tote: %m",
+      "%f:%l: %trror: %m",
+      "%f:%l: %tarning: %m",
+      "%f(%l): %trror: %m",       -- MSVC cl.exe
+      "%f(%l,%c): %trror: %m",    -- MSVC alternative
+      "%f:%l: %m",
+    }, ",")
+  end,
+})
+
+-- Disable LSP / readonly in vendored third-party C/C++ (common in CMake builds)
+autocmd({ "BufRead", "BufNewFile" }, {
+  group = c_group,
+  pattern = { "*/_deps/*", "*/third_party/*", "*/external/*" },
+  callback = function()
+    vim.opt_local.readonly = true
+    vim.opt_local.modifiable = false
+    vim.opt_local.buflisted = false
+  end,
+})
+
 

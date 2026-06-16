@@ -273,6 +273,78 @@ M.setup_lsp("cssls", {
 M.setup_lsp("gopls", {
   cmd = { "gopls" },
   filetypes = { "go", "gomod", "gowork", "gotmpl" },
+  settings = {
+    gopls = {
+      -- Memory: cap analyses memory usage
+      analyses = {
+        unusedparams = false,   -- noisy, slow
+        unusedwrite = false,    -- noisy
+        unusedresult = false,
+        shadow = false,         -- slow on large files
+        nilness = false,        -- expensive flow analysis
+        fieldalignment = false, -- slow on large structs
+      },
+      -- Staticcheck OFF: faster, fewer warnings (run separately if needed)
+      staticcheck = false,
+      -- Semantic tokens OFF: big perf win, gopls is heavy
+      semanticTokens = false,
+      -- No goimports auto-format (conform handles)
+      -- (goimports setting removed; not a valid gopls option here)
+      -- Completion: case-insensitive is faster
+      matcher = "CaseInsensitive",
+      -- Use GOPATH cache
+      buildFlags = {},
+      -- Inlay hints OFF
+      hints = {
+        assignVariableTypes = false,
+        compositeLiteralFields = false,
+        constantValues = false,
+        functionTypeParameters = false,
+        parameterNames = false,
+        rangeOverFunction = false,
+      },
+      -- No code lens (gopls default is on)
+      codelenses = {
+        references = false,
+        implementation = false,
+      },
+    },
+  },
+})
+
+-- C/C++: clangd
+M.setup_lsp("clangd", {
+  cmd = { "clangd" },
+  filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+  root_dir = function(fname)
+    local util = require "lspconfig.util"
+    -- Prefer compile_commands.json (CMake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON, Meson, Bear)
+    -- Fallback to CMakeLists/Makefile/meson/.clangd/.git
+    return util.root_pattern(
+      "compile_commands.json",
+      "compile_flags.txt",
+      ".clangd",
+      "CMakeLists.txt",
+      "Makefile",
+      "meson.build",
+      ".git"
+    )(fname)
+  end,
+  single_file_support = true,
+  flags = {
+    debounce_text_changes = 200,
+    allow_incremental_sync = true,
+  },
+  settings = {
+    clangd = {
+      -- Fallback flags when no compile_commands.json (covers stdlib only)
+      fallbackFlags = { "-std=c17" },
+      -- Inlay hints OFF by default; toggle per-buffer if needed
+      inlayHints = { Enable = false },
+      -- Header insertion: IWYU style
+      headerInsertion = "iwyu",
+    },
+  },
 })
 
 -- SQL

@@ -109,6 +109,7 @@ return {
           "javascript", "json", "markdown", "markdown_inline",
           "dart", "go", "sql",
           "kotlin",
+          "c", "cpp",
         }
 
         for _, parser in ipairs(parsers) do

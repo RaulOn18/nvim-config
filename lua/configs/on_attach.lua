@@ -23,6 +23,13 @@ M.server_overrides = {
   gopls = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentRangeFormattingProvider = false
+    -- semantic tokens already off via settings, but force nil
+    client.server_capabilities.semanticTokensProvider = nil
+  end,
+  -- clangd: heavy on large codebases, disable semantic tokens (clangd ships its own)
+  clangd = function(client, bufnr)
+    client.server_capabilities.semanticTokensProvider = nil
+    -- inlayHints controlled by clangd setting + vim.lsp.inlay_hint.enable() if needed
   end,
 }
 
@@ -36,6 +43,10 @@ function M.on_attach(client, bufnr)
   -- Default: disable formatting (use conform.nvim)
   client.server_capabilities.documentFormattingProvider = false
   client.server_capabilities.documentRangeFormattingProvider = false
+
+  -- Disable documentColor (Neovim 0.12+ auto-enables and triggers assert in
+  -- vim/lsp/document_color.lua:225 when client advertises the capability)
+  client.server_capabilities.documentColorProvider = nil
 
   -- Per-server override
   local override = M.server_overrides[client.name]

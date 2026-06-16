@@ -92,11 +92,13 @@ return {
             require("dap.ext.vscode").load_launchjs()
           end,
         },
-        widget_guides = { enabled = true },
+        -- widget_guides OFF: big perf win on large widget trees (was ON)
+        widget_guides = { enabled = false },
+        -- closing_tags OFF: visual cost, can re-enable if needed
         closing_tags = {
           highlight = "ErrorMsg",
           prefix = ">",
-          enabled = true,
+          enabled = false,
         },
         lsp = {
           handlers = {
@@ -133,11 +135,8 @@ return {
   })
 end, { desc = "Flutter Commands (fzf)", buffer = bufnr })
 
-            -- Document Colors (Neovim 0.12+)
-            local ok_color, _ = pcall(vim.lsp.document_color.enable, true, { bufnr = bufnr })
-            if not ok_color then
-              vim.notify("document_color API not available", vim.log.levels.DEBUG)
-            end
+            -- Document Colors: disabled globally via on_attach (sets
+            -- server_capabilities.documentColorProvider = nil)
 
             -- Force Enable Code Action Provider (ensure dart refactor actions show)
             if type(client.server_capabilities.codeActionProvider) ~= "table" then
@@ -146,7 +145,7 @@ end, { desc = "Flutter Commands (fzf)", buffer = bufnr })
           end,
           settings = {
             showTodos = false,
-            completeFunctionCalls = true,
+            completeFunctionCalls = false,  -- was true; saves time per completion
             renameFilesWithClasses = "prompt",
             updateImportsOnRename = true,
             analysisExcludedFolders = {
@@ -154,6 +153,9 @@ end, { desc = "Flutter Commands (fzf)", buffer = bufnr })
               vim.fn.expand "$HOME/.flutter",
               project_root .. "/build",
               project_root .. "/.dart_tool",
+              project_root .. "/ios/Pods",
+              project_root .. "/android/.gradle",
+              project_root .. "/.idea",
             },
           },
         },

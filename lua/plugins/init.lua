@@ -12,6 +12,7 @@ return {
   { import = "plugins.flutter" },   -- Flutter development
   { import = "plugins.markdown" },  -- Markdown support
   { import = "plugins.sql" },       -- SQL editor support
+  { import = "plugins.c" },         -- C/C++: clangd, clang-format, codelldb
   { import = "plugins.kotlin" },    -- Kotlin/Android/Compose support
 
   -- Disable NvChad bundled telescope (replaced by fzf-lua)

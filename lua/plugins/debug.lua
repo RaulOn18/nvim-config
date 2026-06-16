@@ -167,6 +167,54 @@ return {
         }
       end
 
+      -- C/C++: codelldb (install: download release exe from vadimcn/codelldb)
+      -- Expected location: PATH (e.g. scoop shim) or vim.fn.stdpath("data") .. "/codelldb/adapter/codelldb.exe"
+      local codelldb_path = vim.fn.exepath("codelldb")
+      if codelldb_path == "" then
+        local candidates = {
+          vim.fn.stdpath("data") .. "/codelldb/adapter/codelldb.exe",
+          vim.fn.stdpath("data") .. "/mason/packages/codelldb/adapter/codelldb.exe",
+          "C:/Program Files/codelldb/adapter/codelldb.exe",
+        }
+        for _, p in ipairs(candidates) do
+          if vim.fn.filereadable(p) == 1 then codelldb_path = p; break end
+        end
+      end
+      if codelldb_path ~= "" then
+        dap.adapters["codelldb"] = {
+          type = "server",
+          port = "${port}",
+          executable = {
+            command = codelldb_path,
+            args = { "--port", "${port}" },
+          },
+        }
+        local c_cfgs = {
+          {
+            type = "codelldb",
+            name = "Launch",
+            request = "launch",
+            program = function()
+              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file")
+            end,
+            cwd = "${workspaceFolder}",
+            stopOnEntry = false,
+          },
+          {
+            type = "codelldb",
+            name = "Attach to process",
+            request = "attach",
+            program = function()
+              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file")
+            end,
+            pid = require("dap.utils").pick_process,
+            cwd = "${workspaceFolder}",
+          },
+        }
+        dap.configurations.c = c_cfgs
+        dap.configurations.cpp = c_cfgs
+      end
+
       -- Android (adb via Mason)
       -- For Android debugging, use gradle + adb directly
       -- or install android-debug-adapter via Mason if available

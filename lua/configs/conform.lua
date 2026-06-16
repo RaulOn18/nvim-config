@@ -26,6 +26,11 @@ local options = {
     -- KOTLIN FORMATTERS
     -- ============================================
     kotlin = { "ktfmt" },
+    -- ============================================
+    -- C/C++ FORMATTERS
+    -- ============================================
+    c = { "clang_format" },
+    cpp = { "clang_format" },
   },
 
   -- Formatters configuration
@@ -62,6 +67,12 @@ local options = {
     ktlint = {
       command = "ktlint",
       args = { "--format", "--stdin" },
+      stdin = true,
+    },
+    -- clang-format uses .clang-format from project root, falls back to LLVM style
+    clang_format = {
+      command = "clang-format",
+      args = { "--style=file", "--fallback-style=LLVM" },
       stdin = true,
     },
   },
