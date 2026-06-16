@@ -85,6 +85,7 @@ return {
     ---@type fzf-lua.Config|{}
     ---@diagnostic disable: missing-fields
     opts = {
+      "default-title",
       winopts = {
         height = 0.85,
         width = 0.87,
@@ -94,9 +95,6 @@ return {
           scrollbar = "float",
         },
       },
-      -- Path display: filename only = less rendering
-      path_display = { "filename_first" },
-      -- fzf UI: strip non-essential rendering for speed
       fzf_colors = true,
       fzf_opts = {
         ["--no-bold"] = true,
@@ -107,32 +105,25 @@ return {
         cwd_prompt = false,
         file_ignore_patterns = { "node_modules", "%.git", "%.next", "dist", "build", "target", "%.lock" },
         fd_opts = "--color=never --type f --hidden --follow --exclude .git --exclude node_modules --exclude .next --exclude dist --exclude build --exclude target --max-depth 8",
-        -- Use rg as fallback if fd unavailable
         rg_opts = "--color=never --files --hidden --follow --glob '!.git' --glob '!node_modules' --glob '!.next' --glob '!dist' --glob '!build' --glob '!target'",
       },
       grep = {
         rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns 200 --max-depth 6 -e",
-        -- Ripgrep glob: skip heavy dirs at search time
         rg_glob = false,
       },
-      -- Disable bat previewer: use native vim buffer (no subprocess spawn)
       previewers = {
         bat = { enabled = false },
         builtin = {
           syntax = true,
-          syntax_limit_l = 500, -- skip syntax highlight for huge files
-          syntax_limit_b = 1024 * 100, -- 100KB limit
+          syntax_limit_l = 500,
+          syntax_limit_b = 1024 * 100,
         },
       },
-      -- Register as vim.ui.select backend
       ui_select = true,
-      -- Disable code action previewer: vtsls 5.9.x crashes on codeAction/resolve
-      -- with "Expected to find a range to extract" / "Expected applicable refactor info"
       lsp = {
         code_actions = { previewer = false },
       },
     },
-    ---@diagnostic enable: missing-fields
     config = function(_, opts)
       require("fzf-lua").setup(opts)
     end,
