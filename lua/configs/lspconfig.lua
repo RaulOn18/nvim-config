@@ -157,8 +157,9 @@ M.setup_lsp("vtsls", {
   settings = {
     typescript = {
       tsserver = {
-        maxTsServerMemory = 6144,
+        maxTsServerMemory = 3072,
         logVerbosity = "off",
+        useSyntaxServer = "never",  -- saves ~200MB; disable secondary syntax server
       },
       suggest = {
         autoImports = false,

@@ -58,13 +58,14 @@ return {
         max_view_entries = 15, -- Fewer entries = faster render
       },
       completion = {
-        keyword_length = 2,    -- Trigger after 2 chars (less noise)
+        keyword_length = 3,    -- Trigger after 3 chars (less LSP spam)
         autocomplete = { "InsertEnter", "TextChanged" },  -- Not on every keystroke
       },
       sources = {
         { name = "nvim_lsp", priority = 1000 },
         { name = "luasnip", priority = 750 },
-        { name = "async_path", priority = 500 },
+        -- async_path disabled for performance; uncomment if you need path completion
+        -- { name = "async_path", priority = 500 },
         -- buffer source: only in non-LSP files to reduce noise
         { name = "buffer", keyword_length = 3, priority = 250,
           option = {
@@ -83,7 +84,7 @@ return {
   -- Treesitter dengan optimizations
   {
     "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPost", "BufNewFile" },
+    event = { "InsertEnter", "TextChanged" },
     build = ":TSUpdate",
     config = function()
       -- Ensure treesitter uses local compiler on Linux
@@ -95,7 +96,8 @@ return {
       require("nvim-treesitter.config").setup {
         install_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site'),
         highlight = { enable = true },
-        indent = { enable = true },
+        -- indent disabled for performance; use built-in indenting instead
+        indent = { enable = false },
         incremental_selection = { enable = false },  -- Disable for performance
       }
 
