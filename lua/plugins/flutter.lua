@@ -1,63 +1,59 @@
+-- Flutter (flutter-tools.nvim): commands picker, is_flutter_project guard,
+-- codeActionProvider dance. flutter_tools_log_level / flutter_show_log_on_run
+-- moved here from options.lua.
+
+vim.g.flutter_tools_log_level = "WARN"
+vim.g.flutter_show_log_on_run = "error"
+
+local function is_flutter_project()
+  return vim.fn.filereadable(vim.fn.getcwd() .. "/pubspec.yaml") == 1
+end
+
 return {
   {
     "nvim-flutter/flutter-tools.nvim",
     lazy = true,
     ft = "dart",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    commands = {
+      "FlutterRun", "FlutterRunDebug", "FlutterRestart", "FlutterReload", "FlutterQuit",
+      "FlutterDevices", "FlutterEmulators", "FlutterVisualDebug", "FlutterOpenDevLog",
+      "FlutterOpenTimeline", "FlutterOutlineOpen", "FlutterOutlineClose",
+      "FlutterOutlineToggle", "FlutterGetPackages",
     },
     init = function()
       local autocmd = vim.api.nvim_create_autocmd
-      local augroup = vim.api.nvim_create_augroup
-      local flutter_group = augroup("FlutterOptimizations", { clear = true })
+      local augroup = vim.api.nvim_create_augroup("FlutterKeymaps", { clear = true })
 
-      -- Flutter-specific keymaps
+      -- Dart extract widget/method + quick fix (guarded by is_flutter_project)
       autocmd("FileType", {
-        group = flutter_group,
+        group = augroup,
         pattern = "dart",
         callback = function(args)
+          if not is_flutter_project() then return end
           vim.keymap.set("n", "<leader>fe", function()
-            vim.lsp.buf.code_action({
-              filter = function(action)
-                return action.title:match("Extract widget") or
-                       action.title:match("Extract method")
-              end,
+            vim.lsp.buf.code_action {
+              filter = function(a) return a.title:match "Extract" end,
               apply = true,
-            })
-          end, { buffer = args.buf, desc = "Flutter: Extract widget/method" })
+            }
+          end, { buffer = args.buf, desc = "Flutter: Extract" })
+
           vim.keymap.set("n", "<leader>fx", function()
-            vim.lsp.buf.code_action({
-              filter = function(action)
-                return action.isPreferred or action.kind == "quickfix"
-              end,
+            vim.lsp.buf.code_action {
+              filter = function(a) return a.isPreferred or a.kind == "quickfix" end,
               apply = true,
-            })
+            }
           end, { buffer = args.buf, desc = "Flutter: Quick fix" })
         end,
       })
     end,
     config = function()
-      local function is_flutter_project()
-        return vim.fn.findfile("pubspec.yaml", vim.fn.getcwd() .. ";") ~= ""
-      end
-
-      if not is_flutter_project() then
-        return
-      end
-
       local project_root = vim.fn.getcwd()
 
       require("flutter-tools").setup {
-        ui = {
-          border = "rounded",
-          notification_style = "native",
-        },
+        ui = { border = "rounded", notification_style = "native" },
         decorations = {
-          statusline = {
-            app_version = true,
-            device = true,
-            project_config = true,
-          },
+          statusline = { app_version = true, device = true, project_config = true },
         },
         debugger = {
           enabled = true,
@@ -67,47 +63,25 @@ return {
             require("dap.ext.vscode").load_launchjs()
           end,
         },
-        -- widget_guides OFF: big perf win on large widget trees (was ON)
         widget_guides = { enabled = false },
-        -- closing_tags OFF: visual cost, can re-enable if needed
-        closing_tags = {
-          highlight = "ErrorMsg",
-          prefix = ">",
-          enabled = false,
-        },
+        closing_tags = { enabled = false },
         lsp = {
           on_attach = function(client, bufnr)
-            local lsp_on_attach = require "configs.on_attach"
-            lsp_on_attach.on_attach(client, bufnr)
-
-            local map = vim.keymap.set
-            map("n", "<leader>Fr", "<cmd>FlutterRun<cr>", { desc = "Flutter Run", buffer = bufnr })
-            map("n", "<leader>FR", "<cmd>FlutterRestart<cr>", { desc = "Flutter Restart", buffer = bufnr })
-            map("n", "<leader>Fq", "<cmd>FlutterQuit<cr>", { desc = "Flutter Quit", buffer = bufnr })
-            map("n", "<leader>Fc", "<cmd>FlutterReload<cr>", { desc = "Hot Reload", buffer = bufnr })
-            map("n", "<leader>Ft", function()
-              local commands = {
-                "FlutterRun", "FlutterRestart", "FlutterReload", "FlutterQuit",
-                "FlutterDetach", "FlutterEmulators", "FlutterDevices",
-                "FlutterOutline", "FlutterDevTools", "FlutterCopyProfilerUrl",
-                "FlutterPubGet", "FlutterPubUpgrade", "FlutterLspRestart",
-                "FlutterSuperUpdateImports",
-              }
-              vim.ui.select(commands, { prompt = "Flutter Commands" }, function(choice)
-                if choice then
-                  vim.cmd(choice)
-                end
-              end)
-            end, { desc = "Flutter Commands", buffer = bufnr })
-
-            -- Force Enable Code Action Provider (ensure dart refactor actions show)
-            if type(client.server_capabilities.codeActionProvider) ~= "table" then
-              client.server_capabilities.codeActionProvider = {}
+            require("configs.on_attach").on_attach(client, bufnr)
+            -- Disable unwanted code action kinds (Flutter LSP advertises them but
+            -- they don't work well without a Flutter context)
+            if client.name == "dartls" then
+              client.server_capabilities.codeActionProvider = { codeActionKinds = {} }
             end
+            local map = vim.keymap.set
+            map("n", "<leader>Fr", "<cmd>FlutterRun<cr>",     { desc = "Flutter Run",     buffer = bufnr })
+            map("n", "<leader>FR", "<cmd>FlutterRestart<cr>",  { desc = "Flutter Restart", buffer = bufnr })
+            map("n", "<leader>Fq", "<cmd>FlutterQuit<cr>",     { desc = "Flutter Quit",    buffer = bufnr })
+            map("n", "<leader>Fc", "<cmd>FlutterReload<cr>",   { desc = "Hot Reload",      buffer = bufnr })
           end,
           settings = {
             showTodos = false,
-            completeFunctionCalls = false,  -- was true; saves time per completion
+            completeFunctionCalls = false,
             renameFilesWithClasses = "prompt",
             updateImportsOnRename = true,
             analysisExcludedFolders = {
@@ -122,8 +96,6 @@ return {
           },
         },
       }
-
-      -- NOTE: Flutter commands use vim.ui.select (backed by Telescope)
     end,
   },
 }

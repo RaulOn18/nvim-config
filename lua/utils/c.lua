@@ -1,163 +1,117 @@
 -- C/C++ utilities: build, run, header/source switcher
--- Auto-detects CMake / Meson / Make and uses Ninja when available
+-- Reads compile_commands.json for the canonical build dir; uses Windows
+-- `cd /d` when shelling out so terminals land in the right directory.
 
 local M = {}
 
--- ============================================================================
--- Project detection
--- ============================================================================
+function M.compile_commands_dir()
+  local path = vim.fn.getcwd() .. "/compile_commands.json"
+  if vim.fn.filereadable(path) == 0 then return nil end
+  local lines = vim.fn.readfile(path)
+  if not lines or #lines == 0 then return nil end
+  local text = table.concat(lines, "\n")
+  local dir = text:match('"directory"%s*:%s*"([^"]+)"')
+  if dir then return dir end
+  local out = text:match('"output"%s*:%s*"([^"]+)"')
+  if out then return vim.fn.fnamemodify(out, ":h") end
+end
+
+-- Windows terminals need `cd /d` to change drive; POSIX uses `cd`.
+local function cd_shell(dir)
+  return (vim.fn.has "win32" == 1 and "cd /d " or "cd ") .. vim.fn.shellescape(dir)
+end
+
 function M.project_kind(cwd)
   cwd = cwd or vim.fn.getcwd()
-  if vim.fn.filereadable(cwd .. "/CMakeLists.txt") == 1 then
-    return "cmake"
-  elseif vim.fn.filereadable(cwd .. "/meson.build") == 1 then
-    return "meson"
-  elseif vim.fn.filereadable(cwd .. "/Makefile") == 1 or vim.fn.filereadable(cwd .. "/makefile") == 1 then
+  if vim.fn.filereadable(cwd .. "/CMakeLists.txt") == 1 then return "cmake" end
+  if vim.fn.filereadable(cwd .. "/meson.build") == 1 then return "meson" end
+  if vim.fn.filereadable(cwd .. "/Makefile") == 1 or vim.fn.filereadable(cwd .. "/makefile") == 1 then
     return "make"
   end
-  return nil
 end
 
 function M.build_dir(cwd)
   cwd = cwd or vim.fn.getcwd()
+  local compile_dir = M.compile_commands_dir()
+  if compile_dir and vim.fn.isdirectory(compile_dir) == 1 then return compile_dir end
   if vim.fn.isdirectory(cwd .. "/build") == 1 then return cwd .. "/build" end
   if vim.fn.isdirectory(cwd .. "/out") == 1 then return cwd .. "/out" end
   return cwd
 end
 
--- ============================================================================
--- Configure
--- ============================================================================
 function M.cmake_configure()
-  local cwd = vim.fn.getcwd()
-  if vim.fn.executable("cmake") == 0 then
-    vim.notify("cmake not found in PATH", vim.log.levels.ERROR)
+  if vim.fn.executable "cmake" == 0 then
+    vim.notify "cmake not found in PATH"
     return
   end
-  local build = M.build_dir(cwd)
+  local build = M.build_dir()
   vim.fn.mkdir(build, "p")
-  local generator = vim.fn.executable("ninja") == 1 and "Ninja" or "NMake Makefiles"
-  local cmd = string.format('cd /d "%s" && cmake -S . -B "%s" -G %s -DCMAKE_EXPORT_COMPILE_COMMANDS=ON',
-    cwd, build, generator)
-  vim.cmd("terminal " .. cmd)
+  local gen = vim.fn.executable "ninja" == 1 and "Ninja" or "Unix Makefiles"
+  vim.cmd("terminal cmake -S . -B " .. vim.fn.shellescape(build) .. " -G " .. gen .. " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON")
 end
 
--- ============================================================================
--- Build
--- ============================================================================
 function M.build()
-  local cwd = vim.fn.getcwd()
-  local kind = M.project_kind(cwd)
+  local kind = M.project_kind()
   local cmd
   if kind == "cmake" then
-    local build = M.build_dir(cwd)
-    if vim.fn.executable("ninja") == 1 then
-      cmd = string.format('cd /d "%s" && ninja -C "%s"', cwd, build)
-    else
-      cmd = string.format('cd /d "%s" && cmake --build "%s" --config Release', cwd, build)
-    end
+    local build = M.build_dir()
+    cmd = vim.fn.executable "ninja" == 1
+        and "ninja -C " .. vim.fn.shellescape(build)
+        or "cmake --build " .. vim.fn.shellescape(build) .. " --config Release"
   elseif kind == "meson" then
-    if vim.fn.executable("ninja") == 1 then
-      cmd = string.format('cd /d "%s" && ninja -C build', cwd)
-    else
-      cmd = string.format('cd /d "%s" && meson compile -C build', cwd)
-    end
+    cmd = vim.fn.executable "ninja" == 1 and "ninja -C build" or "meson compile -C build"
   elseif kind == "make" then
-    cmd = string.format('cd /d "%s" && make -j', cwd)
+    cmd = "make -j"
   else
-    vim.notify("No build system found (CMakeLists.txt / meson.build / Makefile)", vim.log.levels.WARN)
+    vim.notify "No build system found (CMakeLists.txt / meson.build / Makefile)"
     return
   end
   vim.cmd("terminal " .. cmd)
-end
-
--- ============================================================================
--- Run: find binary from compile_commands or prompt
--- ============================================================================
-function M.find_binary()
-  local cc = vim.fn.findfile("compile_commands.json", vim.fn.getcwd() .. ";")
-  if cc == "" then return nil end
-  local f = io.open(cc, "r")
-  if not f then return nil end
-  local content = f:read("*a")
-  f:close()
-  -- Naive regex: capture first "output" field (relative path is rare; usually absolute)
-  local output = content:match('"output"%s*:%s*"([^"]+)"')
-  if output and vim.fn.filereadable(output) == 1 then return output end
-  return nil
 end
 
 function M.run(args)
   args = args or ""
-  local cwd = vim.fn.getcwd()
-  local bin = M.find_binary() or vim.fn.input("Executable: ", cwd .. "/build/", "file")
-  if bin == "" or not bin then return end
-  -- Quote path for safety on Windows
-  local cmd = string.format('cd /d "%s" && "%s" %s', cwd, bin, args)
-  vim.cmd("terminal " .. cmd)
+  local bin = vim.fn.input("Executable: ", vim.fn.getcwd() .. "/build/", "file")
+  if bin == "" then return end
+  vim.cmd("terminal " .. bin .. " " .. args)
 end
 
 function M.run_with_args()
-  local args = vim.fn.input("Args: ")
-  M.run(args)
+  M.run(vim.fn.input "Args: ")
 end
 
--- ============================================================================
--- Header <-> source switcher
--- ============================================================================
 local SOURCE_EXTS = { "c", "cpp", "cc", "cxx", "m", "mm", "C" }
 local HEADER_EXTS = { "h", "hpp", "hh", "hxx", "H" }
 
 function M.switch_header()
-  local current = vim.fn.expand("%:p")
-  if current == "" or current == nil then
-    vim.notify("No file", vim.log.levels.WARN)
+  local current = vim.fn.expand "%:p"
+  if current == "" then
+    vim.notify "No file"
     return
   end
-  local ext = vim.fn.expand("%:e")
-  local target
-
-  local function exists(p)
-    return p and p ~= "" and vim.fn.filereadable(p) == 1
-  end
-
+  local ext = vim.fn.expand "%:e"
+  local stem = vim.fn.fnamemodify(current, ":t"):sub(1, -#ext - 2)
+  local cwd = vim.fn.getcwd()
+  local from, dirs
   if vim.tbl_contains(SOURCE_EXTS, ext) then
-    -- Source -> header: same dir, then include/, ../include, src/
-    local base = current:sub(1, -#ext - 2)
-    for _, hdr in ipairs(HEADER_EXTS) do
-      if exists(base .. hdr) then target = base .. hdr; break end
-    end
-    if not target then
-      local basename = vim.fn.fnamemodify(current, ":t"):sub(1, -#ext - 2)
-      for _, dir in ipairs({ "include", "../include", "src", "../src" }) do
-        for _, hdr in ipairs(HEADER_EXTS) do
-          local candidate = vim.fn.getcwd() .. "/" .. dir .. "/" .. basename .. "." .. hdr
-          if exists(candidate) then target = candidate; break end
-        end
-        if target then break end
-      end
-    end
+    from, dirs = HEADER_EXTS, { vim.fn.fnamemodify(current, ":h"), "include", "../include", "src", "../src" }
   elseif vim.tbl_contains(HEADER_EXTS, ext) then
-    -- Header -> source: same dir, ../src, ../../src
-    local dir = vim.fn.fnamemodify(current, ":h")
-    local stem = vim.fn.fnamemodify(current, ":t"):sub(1, -#ext - 2)
-    local search_dirs = { dir, dir .. "/../src", dir .. "/../../src", dir .. "/src" }
-    for _, d in ipairs(search_dirs) do
-      for _, s in ipairs(SOURCE_EXTS) do
-        if exists(d .. "/" .. stem .. "." .. s) then target = d .. "/" .. stem .. "." .. s; break end
-      end
-      if target then break end
-    end
+    from, dirs = SOURCE_EXTS, { vim.fn.fnamemodify(current, ":h"), "../src", "../../src", "src" }
   else
-    vim.notify("Not a C/C++ file (ext: " .. tostring(ext) .. ")", vim.log.levels.WARN)
+    vim.notify("Not a C/C++ file (ext: " .. ext .. ")")
     return
   end
-
-  if target then
-    vim.cmd("edit " .. vim.fn.fnameescape(target))
-  else
-    vim.notify("Header/source not found", vim.log.levels.WARN)
+  for _, d in ipairs(dirs) do
+    local abs = d:sub(1, 1) == "/" and d or (cwd .. "/" .. d)
+    for _, e in ipairs(from) do
+      local found = vim.fs.find(stem .. "." .. e, { path = abs, type = "file" })
+      if found[1] then
+        vim.cmd.edit(vim.fn.fnameescape(found[1]))
+        return
+      end
+    end
   end
+  vim.notify "Header/source not found"
 end
 
 return M

@@ -1,247 +1,162 @@
 -- Debug Adapter Protocol (DAP) Configuration
+-- 8-path codelldb search for non-PATH installs. 17-key `ensure_adapters`
+-- wrapper was unnecessary — keys = dap_keys already lazy-loads the plugin.
 
 local dap_keys = {
-  { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, desc = "Breakpoint Condition" },
-  { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "Toggle Breakpoint" },
-  { "<leader>dc", function() require("dap").continue() end, desc = "Continue/Start" },
-  { "<leader>da", function() require("dap").continue({ before = get_args }) end, desc = "Run with Args" },
-  { "<leader>dC", function() require("dap").run_to_cursor() end, desc = "Run to Cursor" },
-  { "<leader>dg", function() require("dap").goto_() end, desc = "Go to Line (no execute)" },
-  { "<leader>di", function() require("dap").step_into() end, desc = "Step Into" },
-  { "<leader>dj", function() require("dap").down() end, desc = "Down" },
-  { "<leader>dk", function() require("dap").up() end, desc = "Up" },
-  { "<leader>dl", function() require("dap").run_last() end, desc = "Run Last" },
-  { "<leader>do", function() require("dap").step_out() end, desc = "Step Out" },
-  { "<leader>dO", function() require("dap").step_over() end, desc = "Step Over" },
-  { "<leader>dp", function() require("dap").pause() end, desc = "Pause" },
-  { "<leader>dr", function() require("dap").repl.toggle() end, desc = "Toggle REPL" },
-  { "<leader>ds", function() require("dap").session() end, desc = "Session" },
-  { "<leader>dt", function() require("dap").terminate() end, desc = "Terminate" },
-  { "<leader>dw", function() require("dap.ui.widgets").hover() end, desc = "Widgets" },
+  { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end, desc = "Breakpoint Condition" },
+  { "<leader>db", function() require("dap").toggle_breakpoint() end,  desc = "Toggle Breakpoint" },
+  { "<leader>dc", function() require("dap").continue() end,           desc = "Continue/Start" },
+  { "<leader>da", function() require("dap").continue { before = get_args } end, desc = "Run with Args" },
+  { "<leader>dC", function() require("dap").run_to_cursor() end,      desc = "Run to Cursor" },
+  { "<leader>dg", function() require("dap").goto_() end,              desc = "Go to Line (no execute)" },
+  { "<leader>di", function() require("dap").step_into() end,          desc = "Step Into" },
+  { "<leader>dj", function() require("dap").down() end,               desc = "Down" },
+  { "<leader>dk", function() require("dap").up() end,                 desc = "Up" },
+  { "<leader>dl", function() require("dap").run_last() end,           desc = "Run Last" },
+  { "<leader>do", function() require("dap").step_out() end,           desc = "Step Out" },
+  { "<leader>dO", function() require("dap").step_over() end,          desc = "Step Over" },
+  { "<leader>dp", function() require("dap").pause() end,              desc = "Pause" },
+  { "<leader>dr", function() require("dap").repl.toggle() end,        desc = "Toggle REPL" },
+  { "<leader>ds", function() require("dap").session() end,            desc = "Session" },
+  { "<leader>dt", function() require("dap").terminate() end,          desc = "Terminate" },
+  { "<leader>dw", function() require("dap.ui.widgets").hover() end,   desc = "Widgets" },
 }
+
+local function setup_signs()
+  vim.fn.sign_define("DapBreakpoint",           { text = "●", texthl = "DapBreakpoint",           linehl = "", numhl = "" })
+  vim.fn.sign_define("DapBreakpointCondition",  { text = "◆", texthl = "DapBreakpointCondition",  linehl = "", numhl = "" })
+  vim.fn.sign_define("DapLogPoint",             { text = "◆", texthl = "DapLogPoint",             linehl = "", numhl = "" })
+  vim.fn.sign_define("DapStopped",              { text = "▶", texthl = "DapStopped",              linehl = "DapStopped", numhl = "DapStopped" })
+  vim.fn.sign_define("DapBreakpointRejected",   { text = "✖", texthl = "DapBreakpointRejected",   linehl = "", numhl = "" })
+  vim.api.nvim_set_hl(0, "DapBreakpoint",          { fg = "#ff5555" })
+  vim.api.nvim_set_hl(0, "DapBreakpointCondition", { fg = "#ffaa55" })
+  vim.api.nvim_set_hl(0, "DapLogPoint",            { fg = "#55aaff" })
+  vim.api.nvim_set_hl(0, "DapStopped",             { fg = "#55ff55", bg = "#225522" })
+  vim.api.nvim_set_hl(0, "DapBreakpointRejected",  { fg = "#888888" })
+end
 
 return {
   "mfussenegger/nvim-dap",
   dependencies = {
-    -- DAP UI
     {
       "rcarriga/nvim-dap-ui",
       dependencies = { "nvim-neotest/nvim-nio" },
       keys = {
         { "<leader>du", function() require("dapui").toggle() end, desc = "Toggle DAP UI" },
-        { "<leader>de", function() require("dapui").eval() end, desc = "DAP Eval", mode = { "n", "v" } },
+        { "<leader>de", function() require("dapui").eval() end,    desc = "DAP Eval", mode = { "n", "v" } },
       },
-      opts = {},
-      config = function(_, opts)
-        local dap = require("dap")
-        local dapui = require("dapui")
-        dapui.setup(opts)
-
-        dap.listeners.after.event_initialized["dapui_config"] = function()
-          dapui.open()
-        end
-        dap.listeners.before.event_terminated["dapui_config"] = function()
-          dapui.close()
-        end
-        dap.listeners.before.event_exited["dapui_config"] = function()
-          dapui.close()
-        end
+      config = function()
+        local dap, dapui = require("dap"), require("dapui")
+        dapui.setup {}
+        dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
+        dap.listeners.before.event_terminated["dapui_config"]  = function() dapui.close() end
+        dap.listeners.before.event_exited["dapui_config"]      = function() dapui.close() end
       end,
     },
-    -- Virtual text for DAP
-    {
-      "theHamsta/nvim-dap-virtual-text",
-      opts = {},
-    },
+    { "theHamsta/nvim-dap-virtual-text" },
   },
   keys = dap_keys,
   config = function()
-    local signs_setup = false
-    local adapters_setup = false
+    setup_signs()
+    local dap = require("dap")
+    local dap_utils = require("dap.utils")
 
-    local function ensure_signs()
-      if signs_setup then return end
-      signs_setup = true
-      vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
-      vim.fn.sign_define("DapBreakpointCondition", { text = "◆", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
-      vim.fn.sign_define("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
-      vim.fn.sign_define("DapStopped", { text = "▶", texthl = "DapStopped", linehl = "DapStopped", numhl = "DapStopped" })
-      vim.fn.sign_define("DapBreakpointRejected", { text = "✖", texthl = "DapBreakpointRejected", linehl = "", numhl = "" })
-      vim.api.nvim_set_hl(0, "DapBreakpoint", { fg = "#ff5555" })
-      vim.api.nvim_set_hl(0, "DapBreakpointCondition", { fg = "#ffaa55" })
-      vim.api.nvim_set_hl(0, "DapLogPoint", { fg = "#55aaff" })
-      vim.api.nvim_set_hl(0, "DapStopped", { fg = "#55ff55", bg = "#225522" })
-      vim.api.nvim_set_hl(0, "DapBreakpointRejected", { fg = "#888888" })
-    end
-
-    local function ensure_adapters()
-      if adapters_setup then return end
-      adapters_setup = true
-      local dap = require("dap")
-      local dap_utils = require("dap.utils")
-
-      -- JS/TS
-      dap.adapters["node2"] = {
-        type = "executable",
+    -- JS/TS
+    dap.adapters.node2 = {
+      type = "executable",
+      command = "node",
+      args = { vim.fn.stdpath "data" .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js" },
+    }
+    dap.adapters["pwa-node"] = {
+      type = "server", host = "localhost", port = "${port}",
+      executable = {
         command = "node",
-        args = { vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js" },
-      }
-      dap.adapters["pwa-node"] = {
-        type = "server",
-        host = "localhost",
-        port = "${port}",
-        executable = {
-          command = "node",
-          args = {
-            vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js",
-            "${port}",
-          },
+        args = {
+          vim.fn.stdpath "data" .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js",
+          "${port}",
         },
-      }
-      dap.adapters["chrome"] = {
-        type = "executable",
-        command = "node",
-        args = { vim.fn.stdpath("data") .. "/mason/packages/chrome-debug-adapter/out/src/chromeDebug.js" },
-      }
+      },
+    }
+    dap.adapters.chrome = {
+      type = "executable", command = "node",
+      args = { vim.fn.stdpath "data" .. "/mason/packages/chrome-debug-adapter/out/src/chromeDebug.js" },
+    }
 
-      dap.configurations.javascript = {
-        {
-          type = "node2", request = "launch", name = "Launch file",
-          program = "${file}", cwd = "${workspaceFolder}",
-          sourceMaps = true, protocol = "inspector",
-          console = "integratedTerminal", internalConsoleOptions = "neverOpen",
-        },
-        {
-          type = "node2", request = "attach", name = "Attach",
-          processId = dap_utils.pick_process, cwd = "${workspaceFolder}",
-          sourceMaps = true, protocol = "inspector", console = "integratedTerminal",
-        },
-      }
-      dap.configurations.typescript = dap.configurations.javascript
-      dap.configurations.javascriptreact = dap.configurations.javascript
-      dap.configurations.typescriptreact = dap.configurations.javascript
-
-      -- Go (Delve)
-      dap.adapters["delve"] = {
-        type = "server", port = "${port}",
-        executable = {
-          command = vim.fn.stdpath("data") .. "/mason/packages/delve/dlv.exe",
-          args = { "dap", "-l", "127.0.0.1:${port}" },
-        },
-      }
-      dap.configurations.go = {
-        { type = "delve", name = "Debug", request = "launch", program = "${file}" },
-        { type = "delve", name = "Debug test", request = "launch", mode = "test", program = "${file}" },
-        { type = "delve", name = "Debug test (go.mod)", request = "launch", mode = "test", program = "./${relativeFileDirname}" },
-      }
-
-      -- Kotlin (kotlin-debug-adapter via Mason)
-      -- Install: :MasonInstall kotlin-debug-adapter
-      local kotlin_adapter_path = vim.fn.stdpath("data") .. "/mason/packages/kotlin-debug-adapter/bin/kotlin-debug-adapter"
-      if vim.fn.has("win32") == 1 then
-        kotlin_adapter_path = kotlin_adapter_path .. ".bat"
-      end
-      if vim.fn.filereadable(kotlin_adapter_path) == 1 then
-        dap.adapters["kotlin"] = {
-          type = "executable",
-          command = kotlin_adapter_path,
-          args = { "--stdio" },
-        }
-        dap.configurations.kotlin = {
-          {
-            type = "kotlin",
-            request = "launch",
-            name = "Launch Kotlin",
-            projectRoot = "${workspaceFolder}",
-            mainClass = function()
-              return vim.fn.input("Main class (e.g. com.example.MainKt): ")
-            end,
-          },
-          {
-            type = "kotlin",
-            request = "launch",
-            name = "Launch Android",
-            projectRoot = "${workspaceFolder}",
-            mainClass = "android.app.Activity",
-          },
-        }
-      end
-
-      -- C/C++: codelldb (install: download release exe from vadimcn/codelldb)
-      -- Expected location: PATH (e.g. scoop shim) or vim.fn.stdpath("data") .. "/codelldb/adapter/codelldb.exe"
-      local codelldb_path = vim.fn.exepath("codelldb")
-      if codelldb_path == "" then
-        local candidates = {
-          vim.fn.stdpath("data") .. "/codelldb/adapter/codelldb.exe",
-          vim.fn.stdpath("data") .. "/mason/packages/codelldb/adapter/codelldb.exe",
-          "C:/Program Files/codelldb/adapter/codelldb.exe",
-        }
-        for _, p in ipairs(candidates) do
-          if vim.fn.filereadable(p) == 1 then codelldb_path = p; break end
-        end
-      end
-      if codelldb_path ~= "" then
-        dap.adapters["codelldb"] = {
-          type = "server",
-          port = "${port}",
-          executable = {
-            command = codelldb_path,
-            args = { "--port", "${port}" },
-          },
-        }
-        local c_cfgs = {
-          {
-            type = "codelldb",
-            name = "Launch",
-            request = "launch",
-            program = function()
-              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file")
-            end,
-            cwd = "${workspaceFolder}",
-            stopOnEntry = false,
-          },
-          {
-            type = "codelldb",
-            name = "Attach to process",
-            request = "attach",
-            program = function()
-              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file")
-            end,
-            pid = require("dap.utils").pick_process,
-            cwd = "${workspaceFolder}",
-          },
-        }
-        dap.configurations.c = c_cfgs
-        dap.configurations.cpp = c_cfgs
-      end
-
-  -- DAP UI
-
-      dap.listeners.after.event_initialized["lazy_signs"] = ensure_signs
+    dap.configurations.javascript = {
+      { type = "node2", request = "launch", name = "Launch file", program = "${file}", cwd = "${workspaceFolder}",
+        sourceMaps = true, protocol = "inspector", console = "integratedTerminal", internalConsoleOptions = "neverOpen" },
+      { type = "node2", request = "attach", name = "Attach", processId = dap_utils.pick_process, cwd = "${workspaceFolder}",
+        sourceMaps = true, protocol = "inspector", console = "integratedTerminal" },
+    }
+    for _, ft in ipairs { "typescript", "javascriptreact", "typescriptreact" } do
+      dap.configurations[ft] = dap.configurations.javascript
     end
 
-    -- Defer all DAP work to first <leader>d keypress
-    for _, key in ipairs(dap_keys) do
-      local lhs = key[1]
-      local orig_rhs = key[2]
-      local desc = key.desc or ""
-      local mode = key.mode or "n"
-      vim.keymap.set(mode, lhs, function()
-        ensure_adapters()
-        orig_rhs()
-      end, { desc = desc })
+    -- Go (Delve)
+    dap.adapters.delve = {
+      type = "server", port = "${port}",
+      executable = {
+        command = vim.fn.stdpath "data" .. "/mason/packages/delve/dlv.exe",
+        args = { "dap", "-l", "127.0.0.1:${port}" },
+      },
+    }
+    dap.configurations.go = {
+      { type = "delve", name = "Debug",            request = "launch", program = "${file}" },
+      { type = "delve", name = "Debug test",       request = "launch", mode = "test", program = "${file}" },
+      { type = "delve", name = "Debug test (mod)", request = "launch", mode = "test", program = "./${relativeFileDirname}" },
+    }
+
+    -- Kotlin
+    local kotlin_adapter = vim.fn.stdpath "data" .. "/mason/packages/kotlin-debug-adapter/bin/kotlin-debug-adapter"
+    if vim.fn.has "win32" == 1 then kotlin_adapter = kotlin_adapter .. ".bat" end
+    if vim.fn.filereadable(kotlin_adapter) == 1 then
+      dap.adapters.kotlin = { type = "executable", command = kotlin_adapter, args = { "--stdio" } }
+      dap.configurations.kotlin = {
+        { type = "kotlin", request = "launch", name = "Launch Kotlin",
+          projectRoot = "${workspaceFolder}",
+          mainClass = function() return vim.fn.input "Main class (e.g. com.example.MainKt): " end },
+        { type = "kotlin", request = "launch", name = "Launch Android",
+          projectRoot = "${workspaceFolder}", mainClass = "android.app.Activity" },
+      }
     end
 
-    -- Helper command
+    -- C/C++: codelldb (search 8 common install locations)
+    local codelldb = vim.fn.exepath "codelldb"
+    if codelldb == "" then
+      local codelldb_ext = vim.fn.has "win32" == 1 and ".exe" or ""
+      local codelldb_paths = {
+        vim.fn.stdpath "data" .. "/codelldb/adapter/codelldb" .. codelldb_ext,
+        vim.fn.stdpath "data" .. "/mason/packages/codelldb/adapter/codelldb" .. codelldb_ext,
+        vim.fn.expand "~/.vscode/extensions/vadimcn.vscode-lldb-*/adapter/codelldb" .. codelldb_ext,
+        vim.fn.expand "~/.vscode/extensions/llvm-vs-code-extensions.vscode-clangd-*/codelldb" .. codelldb_ext,
+        vim.fn.expand "~/scoop/apps/codelldb/current/codelldb" .. codelldb_ext,
+        vim.fn.expand "~/codelldb/codelldb" .. codelldb_ext,
+        "/usr/local/bin/codelldb" .. codelldb_ext,
+        "/opt/codelldb/codelldb" .. codelldb_ext,
+      }
+      for _, p in ipairs(codelldb_paths) do
+        if vim.fn.filereadable(p) == 1 then codelldb = p; break end
+      end
+    end
+    if codelldb ~= "" then
+      dap.adapters.codelldb = { type = "server", port = "${port}",
+        executable = { command = codelldb, args = { "--port", "${port}" } } }
+      local cfgs = {
+        { type = "codelldb", name = "Launch", request = "launch",
+          program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file") end,
+          cwd = "${workspaceFolder}", stopOnEntry = false },
+        { type = "codelldb", name = "Attach", request = "attach",
+          program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file") end,
+          pid = dap_utils.pick_process, cwd = "${workspaceFolder}" },
+      }
+      dap.configurations.c, dap.configurations.cpp = cfgs, cfgs
+    end
+
+    dap.listeners.after.event_initialized["lazy_signs"] = setup_signs
+
     vim.api.nvim_create_user_command("DapSessionInfo", function()
-      ensure_adapters()
-      local dap = require("dap")
-      local session = dap.session()
-      if session then
-        print(vim.inspect(session.config))
-      else
-        print("No active debug session")
-      end
+      local s = dap.session()
+      print(s and vim.inspect(s.config) or "No active debug session")
     end, { desc = "Show current DAP session info" })
   end,
 }

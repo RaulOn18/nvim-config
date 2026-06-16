@@ -1,45 +1,27 @@
 -- Kotlin/Android/Compose Development
 -- Uses kotlin.nvim with JetBrains official kotlin-lsp
+-- Gradle keymaps (<leader>rG/B/R) live in this spec's `keys` field, registered
+-- globally when kotlin.nvim loads at VeryLazy.
 
 return {
-  -- Main Kotlin LSP support via kotlin.nvim
   {
     "AlexandrosAlexiou/kotlin.nvim",
-    ft = { "kotlin" },
-    dependencies = {
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-      "stevearc/oil.nvim",
-      "folke/trouble.nvim",
+    event = "VeryLazy",
+    keys = {
+      { "<leader>rG", "<cmd>terminal ./gradlew<cr>",       { desc = "Gradle Wrapper" } },
+      { "<leader>rB", "<cmd>terminal ./gradlew build<cr>", { desc = "Gradle Build" } },
+      { "<leader>rR", "<cmd>terminal ./gradlew run<cr>",   { desc = "Gradle Run" } },
     },
     config = function()
       local on_attach = require "configs.on_attach"
       local capabilities = require "configs.capabilities"
 
       require("kotlin").setup {
-        -- Root markers for Android/Gradle projects
         root_markers = {
-          "gradlew",
-          "gradlew.bat",
-          ".git",
-          "build.gradle.kts",
-          "build.gradle",
-          "settings.gradle.kts",
-          "settings.gradle",
+          "gradlew", "gradlew.bat", ".git",
+          "build.gradle.kts", "build.gradle",
+          "settings.gradle.kts", "settings.gradle",
         },
-
-        -- Inlay hints (optional, can disable if too noisy)
-        inlay_hints = {
-          enabled = true,
-          parameters = true,
-          types_variable = true,
-          function_return = true,
-        },
-
-        -- Code folding
-        folding = { enabled = true },
-
-        -- LSP config: force cmp capabilities + shared on_attach
         lsp = {
           on_attach = on_attach.on_attach,
           capabilities = capabilities.default,
