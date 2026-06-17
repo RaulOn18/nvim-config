@@ -1,12 +1,9 @@
 -- Debug Adapter Protocol (DAP) Configuration
--- 8-path codelldb search for non-PATH installs. 17-key `ensure_adapters`
--- wrapper was unnecessary — keys = dap_keys already lazy-loads the plugin.
 
 local dap_keys = {
   { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end, desc = "Breakpoint Condition" },
   { "<leader>db", function() require("dap").toggle_breakpoint() end,  desc = "Toggle Breakpoint" },
   { "<leader>dc", function() require("dap").continue() end,           desc = "Continue/Start" },
-  { "<leader>da", function() require("dap").continue { before = get_args } end, desc = "Run with Args" },
   { "<leader>dC", function() require("dap").run_to_cursor() end,      desc = "Run to Cursor" },
   { "<leader>dg", function() require("dap").goto_() end,              desc = "Go to Line (no execute)" },
   { "<leader>di", function() require("dap").step_into() end,          desc = "Step Into" },
@@ -77,11 +74,6 @@ return {
         },
       },
     }
-    dap.adapters.chrome = {
-      type = "executable", command = "node",
-      args = { vim.fn.stdpath "data" .. "/mason/packages/chrome-debug-adapter/out/src/chromeDebug.js" },
-    }
-
     dap.configurations.javascript = {
       { type = "node2", request = "launch", name = "Launch file", program = "${file}", cwd = "${workspaceFolder}",
         sourceMaps = true, protocol = "inspector", console = "integratedTerminal", internalConsoleOptions = "neverOpen" },
@@ -120,23 +112,12 @@ return {
       }
     end
 
-    -- C/C++: codelldb (search 8 common install locations)
+    -- C/C++: codelldb (PATH or mason)
     local codelldb = vim.fn.exepath "codelldb"
     if codelldb == "" then
-      local codelldb_ext = vim.fn.has "win32" == 1 and ".exe" or ""
-      local codelldb_paths = {
-        vim.fn.stdpath "data" .. "/codelldb/adapter/codelldb" .. codelldb_ext,
-        vim.fn.stdpath "data" .. "/mason/packages/codelldb/adapter/codelldb" .. codelldb_ext,
-        vim.fn.expand "~/.vscode/extensions/vadimcn.vscode-lldb-*/adapter/codelldb" .. codelldb_ext,
-        vim.fn.expand "~/.vscode/extensions/llvm-vs-code-extensions.vscode-clangd-*/codelldb" .. codelldb_ext,
-        vim.fn.expand "~/scoop/apps/codelldb/current/codelldb" .. codelldb_ext,
-        vim.fn.expand "~/codelldb/codelldb" .. codelldb_ext,
-        "/usr/local/bin/codelldb" .. codelldb_ext,
-        "/opt/codelldb/codelldb" .. codelldb_ext,
-      }
-      for _, p in ipairs(codelldb_paths) do
-        if vim.fn.filereadable(p) == 1 then codelldb = p; break end
-      end
+      local ext = vim.fn.has "win32" == 1 and ".exe" or ""
+      local p = vim.fn.stdpath "data" .. "/mason/packages/codelldb/adapter/codelldb" .. ext
+      if vim.fn.filereadable(p) == 1 then codelldb = p end
     end
     if codelldb ~= "" then
       dap.adapters.codelldb = { type = "server", port = "${port}",
@@ -151,8 +132,6 @@ return {
       }
       dap.configurations.c, dap.configurations.cpp = cfgs, cfgs
     end
-
-    dap.listeners.after.event_initialized["lazy_signs"] = setup_signs
 
     vim.api.nvim_create_user_command("DapSessionInfo", function()
       local s = dap.session()

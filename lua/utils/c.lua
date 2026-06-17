@@ -1,10 +1,9 @@
 -- C/C++ utilities: build, run, header/source switcher
--- Reads compile_commands.json for the canonical build dir; uses Windows
--- `cd /d` when shelling out so terminals land in the right directory.
+-- Reads compile_commands.json for the canonical build dir.
 
 local M = {}
 
-function M.compile_commands_dir()
+local function compile_commands_dir()
   local path = vim.fn.getcwd() .. "/compile_commands.json"
   if vim.fn.filereadable(path) == 0 then return nil end
   local lines = vim.fn.readfile(path)
@@ -14,11 +13,6 @@ function M.compile_commands_dir()
   if dir then return dir end
   local out = text:match('"output"%s*:%s*"([^"]+)"')
   if out then return vim.fn.fnamemodify(out, ":h") end
-end
-
--- Windows terminals need `cd /d` to change drive; POSIX uses `cd`.
-local function cd_shell(dir)
-  return (vim.fn.has "win32" == 1 and "cd /d " or "cd ") .. vim.fn.shellescape(dir)
 end
 
 function M.project_kind(cwd)
@@ -32,7 +26,7 @@ end
 
 function M.build_dir(cwd)
   cwd = cwd or vim.fn.getcwd()
-  local compile_dir = M.compile_commands_dir()
+  local compile_dir = compile_commands_dir()
   if compile_dir and vim.fn.isdirectory(compile_dir) == 1 then return compile_dir end
   if vim.fn.isdirectory(cwd .. "/build") == 1 then return cwd .. "/build" end
   if vim.fn.isdirectory(cwd .. "/out") == 1 then return cwd .. "/out" end

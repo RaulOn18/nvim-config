@@ -14,10 +14,8 @@ opt.completeopt = "menuone,noinsert,noselect"
 o.lazyredraw = true
 o.synmaxcol = 200
 o.redrawtime = 1000
-o.maxmempattern = 1000
 opt.hidden = true
 opt.history = 100
-opt.undolevels = 1000
 opt.complete = { ".", "w", "b", "u" }
 
 -- Indent: 4 spaces

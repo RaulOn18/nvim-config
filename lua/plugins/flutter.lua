@@ -1,6 +1,5 @@
 -- Flutter (flutter-tools.nvim): commands picker, is_flutter_project guard,
 -- codeActionProvider dance. flutter_tools_log_level / flutter_show_log_on_run
--- moved here from options.lua.
 
 vim.g.flutter_tools_log_level = "WARN"
 vim.g.flutter_show_log_on_run = "error"

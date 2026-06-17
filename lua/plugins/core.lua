@@ -22,7 +22,7 @@ return {
         -- Kotlin / Android
         "kotlin-lsp", "kotlin-debug-adapter", "ktfmt",
         -- Debug
-        "js-debug-adapter", "chrome-debug-adapter", "codelldb",
+        "js-debug-adapter", "codelldb",
       },
     },
   },

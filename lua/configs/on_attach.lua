@@ -9,10 +9,6 @@ local SEM_TOK_OFF = { "vtsls", "gopls", "clangd" }
 
 local PER_SERVER = {
   eslint = function(c) c.server_capabilities.documentFormattingProvider = true end,
-  gopls = function(c)
-    c.server_capabilities.documentFormattingProvider = false
-    c.server_capabilities.documentRangeFormattingProvider = false
-  end,
   sqlls = function(c) c.server_capabilities.completionProvider = { triggerCharacters = { ".", " ", "(" } } end,
 }
 
