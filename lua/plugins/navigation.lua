@@ -36,11 +36,28 @@ return {
       "nvim-telescope/telescope-fzf-native.nvim",
     },
     config = function()
+      local actions = require "telescope.actions"
+      local action_state = require "telescope.actions.state"
+
+      -- ponytail: Windows [id] / (main) routes: normalize separators before :edit.
+      local function open_selected(prompt_bufnr)
+        local entry = action_state.get_selected_entry()
+        if not entry then return end
+        actions.close(prompt_bufnr)
+        local path = entry.path or entry.value
+        vim.cmd("edit " .. vim.fn.fnameescape((path:gsub("\\", "/"))))
+        local row, col = entry.row or entry.lnum, entry.col
+        if row then vim.api.nvim_win_set_cursor(0, { row, col or 1 }) end
+      end
+
       require("telescope").setup {
         defaults = {
           path_display = { "truncate" },
           file_ignore_patterns = {
             "node_modules", "%.git", "%.next", "dist", "build", "target", "%.lock",
+          },
+          mappings = {
+            i = { ["<CR>"] = open_selected },
           },
         },
       }

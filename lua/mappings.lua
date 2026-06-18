@@ -2,6 +2,12 @@ require "nvchad.mappings"
 
 local map = vim.keymap.set
 
+-- Splits (NvChad doesn't ship these by default)
+map("n", "<leader>sv", "<C-w>v", { desc = "Split: Vertical" })
+map("n", "<leader>sh", "<C-w>s", { desc = "Split: Horizontal" })
+map("n", "<leader>se", "<C-w>=", { desc = "Split: Equalize" })
+map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Split: Close" })
+
 map("n", "<leader>cm", "<cmd>Neogit commit<cr>", { desc = "Git Commit (Neogit)" })
 
 -- One copy_path helper, three keymaps (line / full / visual range).
