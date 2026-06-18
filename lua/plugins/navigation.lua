@@ -54,7 +54,7 @@ return {
         defaults = {
           path_display = { "truncate" },
           file_ignore_patterns = {
-            "node_modules", "%.git", "%.next", "dist", "build", "target", "%.lock",
+            "node_modules", "%.git", "%.next", "dist", "build", "target", "%.lock", "graphify%-out[\\/]cache",
           },
           mappings = {
             i = { ["<CR>"] = open_selected },
