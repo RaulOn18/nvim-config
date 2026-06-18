@@ -36,3 +36,18 @@ map("n", "<leader>cb", c "build", { desc = "C: Build" })
 map("n", "<leader>cx", c "run", { desc = "C: Run" })
 map("n", "<leader>cX", c "run_with_args", { desc = "C: Run with args" })
 map("n", "<leader>ch", c "switch_header", { desc = "C: Switch header/source" })
+
+-- Close current buffer and return to the previously active (alternate) one.
+-- Falls back to default bdelete when no alternate exists.
+local function close_buffer()
+  local cur = vim.api.nvim_get_current_buf()
+  local alt = vim.fn.bufnr("#")
+  if alt ~= -1 and alt ~= cur and vim.api.nvim_buf_is_loaded(alt) then
+    vim.cmd("b#")
+    vim.cmd("bdelete " .. cur)
+  else
+    vim.cmd("bdelete " .. cur)
+  end
+end
+map("n", "<leader>bd", close_buffer, { desc = "Close buffer (return to previous)" })
+map("n", "<leader>x", close_buffer, { desc = "Close buffer (return to previous)" })

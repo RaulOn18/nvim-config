@@ -12,8 +12,13 @@ opt.completeopt = "menuone,noinsert,noselect"
 
 -- Large-file + perf
 o.lazyredraw = true
+o.ttyfast = true
 o.synmaxcol = 200
 o.redrawtime = 1000
+o.maxmempattern = 2000
+o.swapfile = false
+o.backup = false
+o.writebackup = false
 opt.hidden = true
 opt.history = 100
 opt.complete = { ".", "w", "b", "u" }

@@ -20,3 +20,15 @@ autocmd("FileType", {
     vim.bo.commentstring = "// %s"
   end,
 })
+
+-- ponytail: diagnostics on non-code filetypes is wasted work, skip it
+autocmd("FileType", {
+  group = augroup("DiagOffNonCode", { clear = true }),
+  pattern = { "help", "man", "text", "gitcommit", "fugitive", "qf", "lazy", "TelescopePrompt" },
+  callback = function(args)
+    local diag = vim.diagnostic
+    if diag and type(diag.disable) == "function" then
+      pcall(diag.disable, args.buf)
+    end
+  end,
+})

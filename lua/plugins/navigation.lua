@@ -27,13 +27,14 @@ return {
     },
   },
 
-  -- Telescope
+  -- Telescope: lazy-load on first `:Telescope` command (NvChad default).
+  -- Eager `VimEnter` was paying the cost on every startup, even on days you never opened Telescope.
   {
     "nvim-telescope/telescope.nvim",
-    event = "VimEnter",
+    cmd = "Telescope",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope-fzf-native.nvim",
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     },
     config = function()
       local actions = require "telescope.actions"
