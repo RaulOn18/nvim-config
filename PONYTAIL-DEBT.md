@@ -11,7 +11,19 @@ Regenerate by invoking the `ponytail-debt` skill.
 
 ## Ledger
 
-**No ponytail: debt. Clean ledger.** The lone stale `ponytail:` marker (autocmds.lua:3) was a deletion log, not a live deferral — converted to a plain `NOTE:` comment.
+**1 live marker, 1 with no trigger.**
+
+`lua/plugins/navigation.lua:42` — custom telescope `<CR>` action re-implements `action_set.edit` + cursor-position just to normalize `\` → `/` in Windows paths. ceiling: only fixes `[id]` / `(main)` route paths via separator swap; does not handle UNC paths, `\\?\` long-path prefix, or other shell-mangled chars. upgrade: `no-trigger` — marker names what changed, not when to revert. Suggested: revisit when telescope.nvim upstream lands a Windows-path-safe `action_set.edit`, or when this repo stops touching Windows.
+
+---
+
+## Live Marker (added this session)
+
+| # | File:Line | Reason | Trigger |
+|---|-----------|--------|---------|
+| 1 | `lua/plugins/navigation.lua:42` | Custom `<CR>` adds `gsub("\\", "/")` + `fnameescape` around `:edit` to fix Windows `[id]` / `(main)` route paths. | Revert when upstream telescope's `action_set.edit` handles mixed-separator Windows paths, or when this repo no longer targets Windows. |
+
+**Marker format check:** the live marker reads `-- ponytail: Windows [id] / (main) routes: normalize separators before :edit.` — describes the fix, not a ceiling+trigger. Tighten to `-- ponytail: Windows-only path escape; drop when upstream handles it.`
 
 ---
 
