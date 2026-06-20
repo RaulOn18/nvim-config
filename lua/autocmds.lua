@@ -32,3 +32,10 @@ autocmd("FileType", {
     end
   end,
 })
+
+-- ponytail: force LF on save. go is required (gofmt rejects CRLF). Skips .bat/.cmd/.ps1 (Windows-native, CRLF-safe).
+autocmd("BufWritePre", {
+  group = augroup("ForceLfOnWrite", { clear = true }),
+  pattern = { "*.ts", "*.tsx", "*.js", "jsx", "*.mjs", "*.cjs", "*.json", "*.jsonc", "*.dart", "*.go", "*.kt", "*.kts", "*.py" },
+  command = "setlocal fileformat=unix",
+})
