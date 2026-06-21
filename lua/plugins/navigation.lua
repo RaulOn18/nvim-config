@@ -12,12 +12,9 @@ return {
     opts = {
       update_focused_file = { enable = true, update_root = false },
       filters = { dotfiles = false, custom = {} },
-      filesystem_watchers = {
-        enable = true,
-        ignore_dirs = {
-          ".next", "node_modules", ".wrangler", ".git", "dist", "build", "target",
-        },
-      },
+      -- ponytail: external tools (pi agents, bun, tsc) hammer FS events in this stack.
+      -- Auto-disable-on-threshold spams errors + lags the tree; press 'r' to refresh manually.
+      filesystem_watchers = { enable = false },
       view = { width = 30, side = "left", preserve_window_proportions = false },
       renderer = {
         indent_width = 1,

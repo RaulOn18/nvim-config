@@ -9,5 +9,7 @@ return {
       { "<leader>ac", ":Augment chat ", desc = "Augment Chat" },
       { "<leader>an", "<cmd>Augment chat-new<cr>", desc = "Augment New Chat" },
     },
+    -- ponytail: keep AI commands dormant unless explicitly invoked
+    lazy = true,
   },
 }

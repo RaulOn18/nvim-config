@@ -36,3 +36,12 @@ require "options"
 require "autocmds"
 
 vim.schedule(function() require "mappings" end)
+
+-- ponytail: disable expensive built-in providers that can spawn watchers on Windows
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_fzf = 0
+vim.g.loaded_man = 0
+vim.g.loaded_remote_plugins = 0

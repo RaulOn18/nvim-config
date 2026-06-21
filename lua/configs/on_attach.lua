@@ -17,6 +17,10 @@ for _, name in ipairs(SEM_TOK_OFF) do
 end
 
 function M.on_attach(client, _)
+  -- ponytail: skip attaching to buffers flagged as bigfiles in autocmds.lua
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.b[bufnr].bigfile then return end
+
   local ok, nvconfig = pcall(require, "nvchad.configs.lspconfig")
   if ok and nvconfig.on_attach then nvconfig.on_attach(client, _) end
 

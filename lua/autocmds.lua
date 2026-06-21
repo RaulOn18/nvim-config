@@ -7,6 +7,27 @@ require "nvchad.autocmds"
 local autocmd = vim.api.nvim_create_autocmd
 local augroup = vim.api.nvim_create_augroup
 
+local bigfile_group = augroup("BigFileGuard", { clear = true })
+
+-- ponytail: guard against accidental huge-buffer spikes.
+-- Turns off heavy features early so one giant file can not eat 10+ GB RAM.
+autocmd({ "BufReadPre", "FileReadPre" }, {
+  group = bigfile_group,
+  callback = function(args)
+    local file = args.match or ""
+    local size = vim.fn.getfsize(file)
+    if size > 1048576 then -- ~1MB
+       vim.b.bigfile = true
+       vim.bo.swapfile = false
+       vim.bo.undolevels = -1
+       vim.bo.syntax = "off"
+       vim.opt_local.spell = false
+       vim.opt_local.wrap = false
+       vim.opt_local.foldmethod = "manual"
+    end
+  end,
+})
+
 -- Kotlin/Android: Android convention (4 spaces, // comments, no wrap)
 autocmd("FileType", {
   group = augroup("KotlinFiletypeSettings", { clear = true }),
@@ -29,6 +50,15 @@ autocmd("FileType", {
     local diag = vim.diagnostic
     if diag and type(diag.disable) == "function" then
       pcall(diag.disable, args.buf)
+    end
+  end,
+})
+
+autocmd("BufWritePost", {
+  group = bigfile_group,
+  callback = function(args)
+    if vim.b[args.buf].bigfile then
+       vim.bo[args.buf].syntax = "off"
     end
   end,
 })
