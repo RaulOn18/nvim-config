@@ -10,18 +10,22 @@ map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Split: Close" })
 
 -- One copy_path helper, three keymaps (line / full / visual range).
 local function copy_path(opts)
-  local rel = vim.fn.fnamemodify(vim.fn.expand "%", ":.")
+  -- nvim_buf_get_name is the canonical API; expand("%") has stale-name edge cases.
+  local name = vim.api.nvim_buf_get_name(0)
+  local rel = name ~= "" and vim.fn.fnamemodify(name, ":.") or "[No Name]"
   local text = rel
   if opts.line then
-    local l = vim.api.nvim_win_get_cursor(0)[1]
-    text = rel .. ":" .. l
-  end
-  if opts.range then
-    local s, e = vim.api.nvim_buf_get_mark(0, "<")[1], vim.api.nvim_buf_get_mark(0, ">")[1]
-    text = s == e and (rel .. ":" .. s) or (rel .. ":" .. s .. "-" .. e)
+    text = rel .. ":" .. vim.api.nvim_win_get_cursor(0)[1]
+  elseif opts.range then
+    -- ponytail: "<"/">" marks are written on visual EXIT, so first entry reads 0.
+    -- line("v") + line(".") is the live visual range.
+    local s, e = vim.fn.line("v"), vim.fn.line(".")
+    if s > e then s, e = e, s end
+    text = (s == e) and (rel .. ":" .. s) or (rel .. ":" .. s .. "-" .. e)
   end
   vim.fn.setreg("+", text)
-  vim.notify(text, vim.log.levels.INFO)
+  -- ponytail: defer toast so the handler returns the instant the clipboard is filled.
+  vim.schedule(function() vim.notify(text, vim.log.levels.INFO) end)
 end
 map("n", "<leader>cp", function() copy_path { line = true } end, { desc = "Copy path:line" })
 map("n", "<leader>cP", function() copy_path {} end, { desc = "Copy path" })
