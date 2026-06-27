@@ -1,15 +1,17 @@
 local options = {
+  -- prettierd: long-running prettier daemon. Drops per-save Node startup
+  -- (~300-500ms -> ~50ms warm). One daemon serves the whole web family.
   formatters_by_ft = {
     lua = { "stylua" },
-    css = { "prettier" },
-    html = { "prettier" },
-    javascript = { "prettier" },
-    typescript = { "prettier" },
-    javascriptreact = { "prettier" },
-    typescriptreact = { "prettier" },
-    json = { "prettier" },
-    jsonc = { "prettier" },
-    markdown = { "prettier" },
+    css = { "prettierd" },
+    html = { "prettierd" },
+    javascript = { "prettierd" },
+    typescript = { "prettierd" },
+    javascriptreact = { "prettierd" },
+    typescriptreact = { "prettierd" },
+    json = { "prettierd" },
+    jsonc = { "prettierd" },
+    markdown = { "prettierd" },
     dart = { "dart_format" },
     sql = { "sql_formatter" },
     go = { "gofumpt", "goimports" },
@@ -33,6 +35,8 @@ local options = {
       stdin = true,
     },
   },
+
+  -- Format on save OFF (manual only). Trigger: <leader>fm (NvChad default) or :ConformInfo.
 }
 
 return options

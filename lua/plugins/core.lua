@@ -11,7 +11,7 @@ return {
       ensure_installed = {
         -- JS/TS
         "vtsls", "typescript-language-server", "vscode-eslint-language-server",
-        "tailwindcss-language-server",
+        "tailwindcss-language-server", "prettierd",
         -- Go
         "gopls", "gofumpt", "goimports", "delve",
         -- Web

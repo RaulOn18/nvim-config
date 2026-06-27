@@ -63,6 +63,19 @@ autocmd("BufWritePost", {
   end,
 })
 
+-- ponytail: web ft use 2-space indent to match prettier default.
+-- Global is 4-space; without this every save re-indents and the buffer jumps.
+autocmd("FileType", {
+  group = augroup("WebIndent", { clear = true }),
+  pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact", "json", "jsonc", "css", "scss", "html", "markdown" },
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.expandtab = true
+  end,
+})
+
 -- ponytail: force LF on save. go is required (gofmt rejects CRLF). Skips .bat/.cmd/.ps1 (Windows-native, CRLF-safe).
 autocmd("BufWritePre", {
   group = augroup("ForceLfOnWrite", { clear = true }),
