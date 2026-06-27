@@ -46,9 +46,9 @@ local function close_buffer()
   local alt = vim.fn.bufnr("#")
   if alt ~= -1 and alt ~= cur and vim.api.nvim_buf_is_loaded(alt) then
     vim.cmd("b#")
-    vim.cmd("bdelete! " .. cur)
+    vim.cmd("confirm bdelete " .. cur)
   else
-    vim.cmd("bdelete! " .. cur)
+    vim.cmd("confirm bdelete " .. cur)
   end
 end
 map("n", "<leader>bd", close_buffer, { desc = "Close buffer (return to previous)" })
