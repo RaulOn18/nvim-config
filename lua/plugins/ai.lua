@@ -1,15 +1,24 @@
 -- AI Assistant Plugins
 
 return {
-  -- Augment AI (lazy load)
+  -- Supermaven: fastest free AI completions (<100ms response, unlimited free tier)
   {
-    "augmentcode/augment.vim",
-    cmd = { "Augment", "AugmentChat" },
-    keys = {
-      { "<leader>ac", ":Augment chat ", desc = "Augment Chat" },
-      { "<leader>an", "<cmd>Augment chat-new<cr>", desc = "Augment New Chat" },
-    },
-    -- ponytail: keep AI commands dormant unless explicitly invoked
-    lazy = true,
+    "supermaven-inc/supermaven-nvim",
+    event = "InsertEnter",
+    config = function()
+      local sm = require "supermaven-nvim"
+
+      sm.setup {
+        keymaps = {
+          accept_suggestion = "<A-f>",
+          clear_suggestion = "<A-c>",
+          accept_word = "<A-w>",
+        },
+        -- ponytail: skip noisy logs in production
+        log_level = "off",
+        -- integrate with cmp: disable inline if cmp is visible
+        disable_inline_completion = false,
+      }
+    end,
   },
 }

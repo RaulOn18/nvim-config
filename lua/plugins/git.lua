@@ -1,5 +1,21 @@
 -- Git Integration Plugins
 
+-- ponytail: separate keymap for submodule status (git-status porcelain doesn't support
+-- --recurse-submodules, so show submodule status in a scratch split).
+vim.keymap.set("n", "<leader>gS", function()
+  local lines = vim.fn.systemlist("git submodule status")
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Not in a git repo or no submodules", vim.log.levels.WARN)
+    return
+  end
+  vim.cmd "belowright 10new"
+  vim.bo.buftype = "nofile"
+  vim.bo.bufhidden = "wipe"
+  vim.api.nvim_buf_set_name(0, "Submodule Status")
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+  vim.bo.modified = false
+end, { desc = "Git Submodule Status" })
+
 return {
   -- Git signs
   {
