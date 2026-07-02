@@ -2,6 +2,12 @@ require "nvchad.mappings"
 
 local map = vim.keymap.set
 
+-- Exit insert mode with jk
+map("i", "jk", "<Esc>", { desc = "Exit insert mode" })
+
+-- ; → : in normal mode (skip Shift for command mode)
+map("n", ";", ":", { desc = "Command mode" })
+
 -- Splits (NvChad doesn't ship these by default)
 map("n", "<leader>sv", "<C-w>v", { desc = "Split: Vertical" })
 map("n", "<leader>sh", "<C-w>s", { desc = "Split: Horizontal" })
