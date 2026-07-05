@@ -11,6 +11,8 @@ return {
     },
     opts = {
       on_attach = function(bufnr)
+        -- ponytail: defining on_attach replaces defaults; apply the default keymap first so <CR>/o/l still expand folders.
+        require("nvim-tree.keymap").on_attach_default(bufnr)
         local api = require "nvim-tree.api"
         local function opts(desc)
           return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
