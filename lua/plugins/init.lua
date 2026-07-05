@@ -10,6 +10,5 @@ return {
   { import = "plugins.ai" },         -- AI assistants
   { import = "plugins.debug" },      -- DAP debugging
   { import = "plugins.flutter" },    -- Flutter development
-  { import = "plugins.sql" },        -- SQL editor support
   { import = "plugins.kotlin" },     -- Kotlin/Android/Compose support
 }

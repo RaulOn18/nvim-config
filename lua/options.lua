@@ -78,7 +78,7 @@ if vim.fn.has "clipboard" == 0 then
 end
 
 -- Shell: bash on Unix, pwsh on Windows
-o.shell = vim.fn.has "unix" == 1 and "/bin/bash" or "pwsh"
+o.shell = vim.fn.has "unix" == 1 and "/bin/fish" or "pwsh"
 
 -- ponytail: keep undo and swap modest to avoid hidden memory hogs
 opt.undofile = false
