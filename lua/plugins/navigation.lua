@@ -10,6 +10,13 @@ return {
       { "<leader>E", "<cmd>NvimTreeFindFile<cr>", desc = "Find File in Tree" },
     },
     opts = {
+      on_attach = function(bufnr)
+        local api = require "nvim-tree.api"
+        local function opts(desc)
+          return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+        vim.keymap.set("n", "gy", api.fs.copy.absolute_path, opts "Copy Absolute Path")
+      end,
       update_focused_file = { enable = true, update_root = false },
       filters = { dotfiles = false, custom = {} },
       -- ponytail: external tools (pi agents, bun, tsc) hammer FS events in this stack.
