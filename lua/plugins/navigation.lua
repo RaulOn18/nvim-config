@@ -41,6 +41,8 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+      -- Routes vim.ui.select (LSP code actions, refactor/rename picks, etc.) through Telescope.
+      "nvim-telescope/telescope-ui-select.nvim",
     },
     config = function()
       local actions = require "telescope.actions"
@@ -67,8 +69,18 @@ return {
             i = { ["<CR>"] = open_selected },
           },
         },
+        extensions = {
+          ["ui-select"] = require("telescope.themes").get_cursor {
+            -- VSCode-style anchored dropdown: code actions feel native next to the cursor.
+            border = "rounded",
+            win_width = 0.4,
+            -- Hide previewer for ui-select — code actions are tiny menu picks, not file/buffer pickers.
+            previewer = false,
+          },
+        },
       }
       pcall(require("telescope").load_extension, "fzf")
+      pcall(require("telescope").load_extension, "ui-select")
     end,
   },
 

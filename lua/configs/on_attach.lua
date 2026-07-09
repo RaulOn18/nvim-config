@@ -1,6 +1,7 @@
 -- Shared on_attach for all LSP servers
 
 local M = {}
+local map = vim.keymap.set
 
 -- 3 servers that only set semanticTokensProvider = nil collapsed into a single
 -- loop. Append to SEM_TOK_OFF if a new server joins that ships unwanted
@@ -23,6 +24,9 @@ function M.on_attach(client, _)
 
   local ok, nvconfig = pcall(require, "nvchad.configs.lspconfig")
   if ok and nvconfig.on_attach then nvconfig.on_attach(client, _) end
+
+  -- Code action picker (Telescope via telescope-ui-select). Both modes: visual-range actions (refactor selection, etc.)
+  map({ "n", "v" }, "gra", vim.lsp.buf.code_action, { buffer = bufnr, desc = "LSP Code Action" })
 
   -- Default: disable formatting (use conform.nvim)
   client.server_capabilities.documentFormattingProvider = false
