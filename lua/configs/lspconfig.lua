@@ -3,6 +3,36 @@
 local on_attach = require "configs.on_attach"
 local capabilities = require "configs.capabilities"
 
+local eslint_ok_cache = {}
+
+local function eslint_root(bufnr, on_dir)
+  local root = vim.fs.root(bufnr, function(name, path)
+    if name == ".eslintrc" or name:match "^%.eslintrc%." or name:match "^eslint%.config%." then return true end
+    if name ~= "package.json" then return false end
+
+    local ok, lines = pcall(vim.fn.readfile, vim.fs.joinpath(path, name))
+    if not ok then return false end
+
+    local ok_json, pkg = pcall(vim.json.decode, table.concat(lines, "\n"))
+    return ok_json and type(pkg) == "table" and pkg.eslintConfig ~= nil
+  end)
+
+  if not root then return end
+
+  local eslint = vim.fs.joinpath(root, "node_modules", ".bin", "eslint")
+  if vim.fn.executable(eslint) ~= 1 then return end
+
+  if eslint_ok_cache[root] == nil then
+    local result = vim.system({ eslint, "--print-config", vim.api.nvim_buf_get_name(bufnr) }, {
+      cwd = root,
+      text = true,
+    }):wait(3000)
+    eslint_ok_cache[root] = result.code == 0
+  end
+
+  if eslint_ok_cache[root] then on_dir(root) end
+end
+
 -- Global defaults applied to every LSP
 vim.lsp.config["*"] = vim.tbl_extend("force", vim.lsp.config["*"] or {}, {
   on_attach = on_attach.on_attach,
@@ -34,9 +64,7 @@ vim.lsp.config.vtsls = {
 vim.lsp.config.eslint = {
   cmd = { "vscode-eslint-language-server", "--stdio" },
   filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
-  root_markers = {
-    ".eslintrc*", "eslint.config.*", "package.json",
-  },
+  root_dir = eslint_root,
   settings = {
     eslint = {
       quiet = true,

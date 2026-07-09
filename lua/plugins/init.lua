@@ -11,4 +11,5 @@ return {
   { import = "plugins.debug" },      -- DAP debugging
   { import = "plugins.flutter" },    -- Flutter development
   { import = "plugins.kotlin" },     -- Kotlin/Android/Compose support
+  { import = "nvchad.blink.lazyspec" }, -- Completion (NvChad's official blink.cmp setup)
 }
