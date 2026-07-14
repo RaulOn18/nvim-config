@@ -1,5 +1,12 @@
 -- LSP configuration: Neovim 0.12+ native vim.lsp.enable
 
+-- ponytail: disable document color globally. Neovim core's handler (vim/lsp/document_color.lua)
+-- doesn't bounds-check ranges -> an LSP returning a range past EOF crashes with
+-- "Index out of bounds". Capability-level disable stops every client/buffer from
+-- requesting it (the per-client documentColorProvider=nil in on_attach is bypassed by
+-- the bigfile early-return, so this is the real fix).
+vim.lsp.document_color.enable(false)
+
 local on_attach = require "configs.on_attach"
 local capabilities = require "configs.capabilities"
 

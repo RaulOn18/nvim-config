@@ -49,11 +49,17 @@ return {
       local action_state = require "telescope.actions.state"
 
       -- ponytail: Windows [id] / (main) routes: normalize separators before :edit.
+      -- Guard: only hijack <CR> for file entries; defer to the picker's own
+      -- default action otherwise (code actions, git pickers, etc. have non-file entries).
       local function open_selected(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         if not entry then return end
-        actions.close(prompt_bufnr)
         local path = entry.path or entry.value
+        if type(path) ~= "string" then
+          actions.select_default(prompt_bufnr)
+          return
+        end
+        actions.close(prompt_bufnr)
         vim.cmd("edit " .. vim.fn.fnameescape((path:gsub("\\", "/"))))
         local row, col = entry.row or entry.lnum, entry.col
         if row then vim.api.nvim_win_set_cursor(0, { row, col or 1 }) end
@@ -72,8 +78,14 @@ return {
         extensions = {
           ["ui-select"] = require("telescope.themes").get_cursor {
             -- VSCode-style anchored dropdown: code actions feel native next to the cursor.
-            border = "rounded",
-            win_width = 0.4,
+            -- ponytail: get_cursor hardcodes width=80 -> a wall of empty space. Cap it so the
+            -- menu hugs the action labels; win_width=0.4 was a dead key the extension ignores.
+            layout_config = {
+              width = function(_, max_columns)
+                return math.min(max_columns, 70)
+              end,
+              height = 10,
+            },
             -- Hide previewer for ui-select — code actions are tiny menu picks, not file/buffer pickers.
             previewer = false,
           },
