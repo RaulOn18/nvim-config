@@ -16,6 +16,9 @@ return {
       local on_attach = require "configs.on_attach"
       local capabilities = require "configs.capabilities"
 
+      local mason_lsp = vim.fn.stdpath "data" .. "/mason/packages/kotlin-lsp"
+      if vim.env.KOTLIN_LSP_DIR == nil and vim.fn.isdirectory(mason_lsp) == 0 then return end
+
       require("kotlin").setup {
         root_markers = {
           "gradlew", "gradlew.bat", ".git",
