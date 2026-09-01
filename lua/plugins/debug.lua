@@ -98,18 +98,6 @@ return {
       { type = "delve", name = "Debug test (mod)", request = "launch", mode = "test", program = "./${relativeFileDirname}" },
     }
 
-    -- Kotlin
-    local kotlin_adapter = vim.fn.stdpath "data" .. "/mason/packages/kotlin-debug-adapter/bin/kotlin-debug-adapter"
-    if vim.fn.has "win32" == 1 then kotlin_adapter = kotlin_adapter .. ".bat" end
-    if vim.fn.filereadable(kotlin_adapter) == 1 then
-      dap.adapters.kotlin = { type = "executable", command = kotlin_adapter, args = { "--stdio" } }
-      dap.configurations.kotlin = {
-        { type = "kotlin", request = "launch", name = "Launch Kotlin",
-          projectRoot = "${workspaceFolder}",
-          mainClass = function() return vim.fn.input "Main class (e.g. com.example.MainKt): " end },
-      }
-    end
-
     -- C/C++: codelldb (PATH or mason)
     local codelldb = vim.fn.exepath "codelldb"
     if codelldb == "" then

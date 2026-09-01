@@ -30,8 +30,6 @@ return {
         "clangd",
         "clang-format",
         -- Kotlin / Android
-        "kotlin-lsp",
-        "kotlin-debug-adapter",
         "ktfmt",
         -- Debug
         "js-debug-adapter",

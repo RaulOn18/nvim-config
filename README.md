@@ -20,7 +20,7 @@ A **modern, modular, and blazing-fast** Neovim configuration forked from [NvChad
 - 🌳 **File Explorer** - Oil.nvim for buffer-like file editing
 - 🔍 **Fuzzy Finder** - Telescope with ripgrep integration
 - 🤖 **AI Assistant** - Augment AI integration for code assistance
-- 🎯 **Kotlin Support** - JetBrains kotlin-lsp via kotlin.nvim for Android/Compose development
+- 🎯 **Kotlin Support** - Treesitter, ktfmt, and Gradle tooling (Kotlin LSP disabled for performance)
 - 📦 **Auto-formatting** - Conform.nvim with Prettier, biome, and more
 
 ---
@@ -84,7 +84,7 @@ Lazy.nvim will automatically install all plugins on first run.
 │   ├── autocmds.lua           # Autocommands
 │   ├── chadrc.lua            # RaulNvim UI configuration
 │   ├── configs/
-│   │   ├── lspconfig.lua     # LSP server configurations (vim.lsp.start)
+│   │   ├── lspconfig.lua     # LSP server configurations (vim.lsp.config / vim.lsp.enable)
 │   │   ├── on_attach.lua     # Shared LSP on_attach handlers
 │   │   ├── conform.lua       # Formatter configuration
 │   │   ├── dap.lua          # Debug adapter configuration
@@ -203,7 +203,7 @@ return {
 Edit `lua/configs/lspconfig.lua` to add/modify language servers:
 
 ```lua
--- Uses custom setup_lsp() wrapper around vim.lsp.start()
+-- Uses custom setup_lsp() wrapper around vim.lsp.config / vim.lsp.enable()
 M.setup_lsp("myserver", {
   cmd = { "myserver", "--stdio" },
   filetypes = { "myfiletype" },
@@ -233,7 +233,7 @@ map("n", "<leader>xx", "<cmd>MyCommand<cr>", { desc = "My description" })
 | Go | ✅ gopls | ✅ gofmt/gofumpt | ✅ delve |
 | Python | ✅ pyright | ✅ black | ✅ debugpy |
 | Flutter/Dart | ✅ dartls | ✅ dart_format | ✅ flutter-tools |
-| Kotlin/Android | ✅ kotlin-lsp (JetBrains) | ✅ ktlint | ✅ kotlin-debug-adapter |
+| Kotlin/Android | disabled (performance) | ✅ ktfmt | ✅ kotlin-debug-adapter |
 | SQL | ✅ sqlls | ✅ sql-formatter | ❌ |
 | CSS/SCSS | ✅ cssls | ✅ prettier | ❌ |
 | HTML | ✅ html | ✅ prettier | ❌ |
