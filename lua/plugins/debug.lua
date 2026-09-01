@@ -107,8 +107,6 @@ return {
         { type = "kotlin", request = "launch", name = "Launch Kotlin",
           projectRoot = "${workspaceFolder}",
           mainClass = function() return vim.fn.input "Main class (e.g. com.example.MainKt): " end },
-        { type = "kotlin", request = "launch", name = "Launch Android",
-          projectRoot = "${workspaceFolder}", mainClass = "android.app.Activity" },
       }
     end
 

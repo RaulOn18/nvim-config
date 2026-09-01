@@ -66,6 +66,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
+    opts = { ensure_installed = { "kotlin", "java", "query", "vim", "vimdoc", "lua", "bash", "json", "yaml" } },
   },
 
   -- Show the current function/class header while scrolling.
