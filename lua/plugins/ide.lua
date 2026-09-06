@@ -10,15 +10,29 @@ return {
     opts = {
       manual_mode = true,
       detection_methods = { "pattern" },
-      patterns = { ".git", "package.json", "tsconfig.json", "Cargo.toml", "go.mod", ">_Makefile",
-                   "build.gradle.kts", "build.gradle", "settings.gradle.kts", "settings.gradle",
-                   "compile_commands.json", "CMakeLists.txt", "meson.build" },
+      patterns = {
+        ".git",
+        "package.json",
+        "tsconfig.json",
+        "Cargo.toml",
+        "go.mod",
+        ">_Makefile",
+        "build.gradle.kts",
+        "build.gradle",
+        "settings.gradle.kts",
+        "settings.gradle",
+        "compile_commands.json",
+        "CMakeLists.txt",
+        "meson.build",
+      },
       ignore_lsp = {},
       exclude_dirs = { "~/", "/tmp", "node_modules", ".git", "build", ".gradle", ".idea" },
       silent_chdir = true,
       scope_chdir = "global",
     },
-    config = function(_, opts) require("project_nvim").setup(opts) end,
+    config = function(_, opts)
+      require("project_nvim").setup(opts)
+    end,
   },
 
   -- Which-key: NvChad loads it on keys/cmd trigger
@@ -29,25 +43,37 @@ return {
       spec = {
         {
           mode = { "n", "v" },
-          { "g",                group = "goto" },
-          { "gs",               group = "surround" },
-          { "]",                group = "next" },
-          { "[",                group = "prev" },
-          { "<leader><tab>",    group = "tabs" },
-          { "<leader>b",        group = "buffer" },
-          { "<leader>c",        group = "code" },
-          { "<leader>f",        group = "file/find" },
-          { "<leader>g",        group = "git" },
-          { "<leader>q",        group = "quit/session" },
-          { "<leader>s",        group = "search" },
-          { "<leader>sr",       group = "replace (grug-far)" },
-          { "<leader>a",        group = "AI (Augment)" },
-          { "<leader>d",        group = "Debug (DAP)" },
-          { "<leader>h",        group = "Git Hunks" },
-          { "<leader>K",        group = "Kotlin/Gradle" },
-          { "<leader>r",        group = "Run/Build" },
+          { "g", group = "goto" },
+          { "gs", group = "surround" },
+          { "]", group = "next" },
+          { "[", group = "prev" },
+          { "<leader><tab>", group = "tabs" },
+          { "<leader>b", group = "buffer" },
+          { "<leader>c", group = "code" },
+          { "<leader>f", group = "file/find" },
+          { "<leader>g", group = "git" },
+          { "<leader>q", group = "quit/session" },
+          { "<leader>s", group = "search" },
+          { "<leader>sr", group = "replace (grug-far)" },
+          { "<leader>a", group = "AI (Augment)" },
+          { "<leader>d", group = "Debug (DAP)" },
+          { "<leader>h", group = "Git Hunks" },
+          { "<leader>K", group = "Kotlin/Gradle" },
+          { "<leader>r", group = "Run/Build" },
         },
       },
     },
+  },
+  {
+    "rachartier/tiny-cmdline.nvim",
+    dependencies = { "saghen/blink.cmp" },
+    init = function()
+      vim.o.cmdheight = 0
+      vim.g.tiny_cmdline = {
+        native_types = {},
+        on_reposition = require("tiny-cmdline").adapters.blink,
+      }
+      require("vim._core.ui2").enable {}
+    end,
   },
 }
