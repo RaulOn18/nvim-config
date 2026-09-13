@@ -145,7 +145,7 @@ vim.lsp.config.sqlls = {
 vim.lsp.enable { "vtsls", "eslint", "tailwindcss", "html", "cssls", "gopls", "clangd", "sqlls" }
 
 vim.diagnostic.config {
-  virtual_text = { prefix = "●", spacing = 4, source = "if_many" },
+  virtual_text = false,
   signs = true,
   underline = true,
   update_in_insert = false,

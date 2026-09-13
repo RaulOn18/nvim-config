@@ -30,6 +30,7 @@ M.ui = {
     theme = "default",
     separator_style = "default",
     order = { "mode", "file", "git", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
+    modules = { diagnostics = function() return require("utils.workspace_diagnostics").statusline() end },
   },
 }
 
