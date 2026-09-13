@@ -108,6 +108,41 @@ return {
     },
   },
 
+  -- Search match counts
+  {
+    "kevinhwang91/nvim-hlslens",
+    event = "VeryLazy",
+    config = function()
+      require("hlslens").setup()
+
+      local function search_motion(key)
+        return function()
+          vim.cmd("normal! " .. vim.v.count1 .. key)
+          require("hlslens").start()
+        end
+      end
+
+      vim.keymap.set("n", "n", search_motion "n", { desc = "Next search match" })
+      vim.keymap.set("n", "N", search_motion "N", { desc = "Previous search match" })
+      vim.keymap.set("n", "*", function()
+        vim.cmd "normal! *"
+        require("hlslens").start()
+      end, { desc = "Search word under cursor" })
+      vim.keymap.set("n", "#", function()
+        vim.cmd "normal! #"
+        require("hlslens").start()
+      end, { desc = "Search word backward" })
+      vim.keymap.set("n", "g*", function()
+        vim.cmd "normal! g*"
+        require("hlslens").start()
+      end, { desc = "Search word under cursor" })
+      vim.keymap.set("n", "g#", function()
+        vim.cmd "normal! g#"
+        require("hlslens").start()
+      end, { desc = "Search word backward" })
+    end,
+  },
+
   -- Search and replace (ripgrep, async)
   {
     "MagicDuck/grug-far.nvim",

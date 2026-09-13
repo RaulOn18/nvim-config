@@ -7,6 +7,20 @@ return {
     nerd_font_variant = "normal",
   },
 
+  sources = {
+    default = { "ripgrep" },
+    providers = {
+      ripgrep = {
+        module = "blink-ripgrep",
+        name = "Ripgrep",
+        opts = {
+          prefix_min_len = 3,
+          backend = { use = "gitgrep-or-ripgrep" },
+        },
+      },
+    },
+  },
+
   completion = {
     -- Disable auto-pick of first item — avoids accidental acceptance
     list = { selection = { preselect = false } },

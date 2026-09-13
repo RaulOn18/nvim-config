@@ -5,6 +5,10 @@ local map = vim.keymap.set
 -- Exit insert mode with jk
 map("i", "jk", "<Esc>", { desc = "Exit insert mode" })
 
+-- Ask Prime Agent with the current buffer or visual selection as context.
+map("n", "<leader>ai", "<cmd>PiAsk<cr>", { desc = "Ask Prime Agent" })
+map("v", "<leader>ai", "<cmd>PiAskSelection<cr>", { desc = "Ask Prime Agent (selection)" })
+
 -- ; → : in normal mode (skip Shift for command mode)
 map("n", ";", ":", { desc = "Command mode" })
 

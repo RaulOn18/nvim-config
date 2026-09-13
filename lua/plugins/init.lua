@@ -18,6 +18,12 @@ return {
     -- fails silently when offline / on unsupported targets; without this build directive the Rust
     -- fuzzy matcher is never compiled and completion falls back to Lua + frecency breaks.
     build = "cargo build --release",
+    dependencies = {
+      {
+        "mikavilpas/blink-ripgrep.nvim",
+        version = "*",
+      },
+    },
     opts = require "configs.blink",
   }, -- Personal overrides
 }
