@@ -70,10 +70,15 @@ return {
     init = function()
       vim.o.cmdheight = 0
       vim.g.tiny_cmdline = {
-        native_types = {},
+        native_types = { "/", "?" },
         on_reposition = require("tiny-cmdline").adapters.blink,
       }
-      require("vim._core.ui2").enable {}
+      require("vim._core.ui2").enable {
+        msg = {
+          target = "msg",
+          msg = { timeout = 2500 },
+        },
+      }
     end,
   },
 }
