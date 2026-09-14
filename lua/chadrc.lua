@@ -27,8 +27,8 @@ M.ui = {
     order = { "treeOffset", "buffers", "tabs", "btns" },
   },
   statusline = {
-    theme = "default",
-    separator_style = "default",
+    theme = "vscode_colored",
+    separator_style = "block",
     order = { "mode", "file", "git", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
     modules = { diagnostics = function() return require("utils.workspace_diagnostics").statusline() end },
   },
