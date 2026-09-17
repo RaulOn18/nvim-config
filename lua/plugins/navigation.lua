@@ -117,29 +117,28 @@ return {
 
       local function search_motion(key)
         return function()
-          vim.cmd("normal! " .. vim.v.count1 .. key)
-          require("hlslens").start()
+          local ok = pcall(vim.cmd, "normal! " .. vim.v.count1 .. key)
+          if ok then
+            require("hlslens").start()
+          end
         end
       end
 
       vim.keymap.set("n", "n", search_motion "n", { desc = "Next search match" })
       vim.keymap.set("n", "N", search_motion "N", { desc = "Previous search match" })
-      vim.keymap.set("n", "*", function()
-        vim.cmd "normal! *"
-        require("hlslens").start()
-      end, { desc = "Search word under cursor" })
-      vim.keymap.set("n", "#", function()
-        vim.cmd "normal! #"
-        require("hlslens").start()
-      end, { desc = "Search word backward" })
-      vim.keymap.set("n", "g*", function()
-        vim.cmd "normal! g*"
-        require("hlslens").start()
-      end, { desc = "Search word under cursor" })
-      vim.keymap.set("n", "g#", function()
-        vim.cmd "normal! g#"
-        require("hlslens").start()
-      end, { desc = "Search word backward" })
+      local function search_word(key, description)
+        vim.keymap.set("n", key, function()
+          local ok = pcall(vim.cmd, "normal! " .. key)
+          if ok then
+            require("hlslens").start()
+          end
+        end, { desc = description })
+      end
+
+      search_word("*", "Search word under cursor")
+      search_word("#", "Search word backward")
+      search_word("g*", "Search word under cursor")
+      search_word("g#", "Search word backward")
     end,
   },
 

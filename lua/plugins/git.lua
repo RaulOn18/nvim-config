@@ -29,12 +29,11 @@ return {
         topdelete = { text = "‾" },
         changedelete = { text = "~" },
       },
-      -- Enable virtual text blame line otomatis
-      current_line_blame = false,  -- Disable for performance (enable manually with <leader>tbl)
+      current_line_blame = true,
       current_line_blame_opts = {
         virt_text = true,
         virt_text_pos = 'eol',
-        delay = 1000,  -- Increased from 300ms
+        delay = 1000,
         ignore_whitespace = false,
         virt_text_priority = 100,
       },

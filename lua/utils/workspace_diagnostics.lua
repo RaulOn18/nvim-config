@@ -13,7 +13,12 @@ local function new_state()
 end
 
 local function root_for_buffer(bufnr)
-  return vim.fs.root(bufnr, { ".git" }) or vim.fn.getcwd()
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return vim.fn.getcwd()
+  end
+
+  local ok, root = pcall(vim.fs.root, bufnr, { ".git" })
+  return ok and (root or vim.fn.getcwd()) or vim.fn.getcwd()
 end
 
 local function belongs_to_root(root, bufnr)
