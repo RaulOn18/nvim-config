@@ -8,11 +8,14 @@ return {
   },
 
   sources = {
-    default = { "ripgrep" },
+    -- Keep semantic/editor-aware completion above project-wide text matches.
+    default = { "lsp", "path", "snippets", "buffer", "ripgrep" },
     providers = {
       ripgrep = {
         module = "blink-ripgrep",
         name = "Ripgrep",
+        -- Ripgrep remains available, but should rank below LSP and other sources.
+        score_offset = -10,
         opts = {
           prefix_min_len = 3,
           backend = { use = "gitgrep-or-ripgrep" },

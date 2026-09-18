@@ -140,9 +140,20 @@ vim.lsp.config.sqlls = {
   filetypes = { "sql", "mysql" },
 }
 
--- NOTE: Kotlin LSP is handled by kotlin.nvim plugin (see plugins/kotlin.lua)
+vim.lsp.config.kmp_lsp = {
+  cmd = { "kmp-lsp" },
+  filetypes = { "kotlin", "java", "swift" },
+  -- Prefer the multi-module workspace root over a nested module directory.
+  root_markers = { "settings.gradle.kts", "settings.gradle", "gradlew", "pom.xml", "Package.swift", ".git" },
+  -- Leave sourcePaths unset so kmp-lsp can auto-mount Gradle sources from its cache.
+  on_attach = function(client, bufnr)
+    on_attach.on_attach(client, bufnr)
+    -- kmp-lsp exposes semantic tokens but Neovim does not enable them automatically.
+    vim.lsp.semantic_tokens.enable(true, { bufnr = bufnr, client_id = client.id })
+  end,
+}
 
-vim.lsp.enable { "vtsls", "eslint", "tailwindcss", "html", "cssls", "gopls", "clangd", "sqlls" }
+vim.lsp.enable { "vtsls", "eslint", "tailwindcss", "html", "cssls", "gopls", "clangd", "sqlls", "kmp_lsp" }
 
 vim.diagnostic.config {
   virtual_text = false,
