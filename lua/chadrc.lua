@@ -2,8 +2,8 @@
 local M = {}
 
 M.base46 = {
-  theme = "tokyonight",
-  transparency = false,
+  theme = "material-deep-ocean",
+  transparency = true,
   hl_override = {
     Comment = { italic = true },
     ["@comment"] = { italic = true },

@@ -41,6 +41,20 @@ map("n", "<leader>cp", function() copy_path { line = true } end, { desc = "Copy 
 map("n", "<leader>cP", function() copy_path {} end, { desc = "Copy path" })
 map("v", "<leader>cp", function() copy_path { range = true } end, { desc = "Copy path:lines" })
 
+-- NvChad terminal can retain a closed float after its shell exits.
+local function toggle_float_terminal()
+  local terms = vim.g.nvchad_terms or {}
+  for key, term in pairs(terms) do
+    if term.id == "floatTerm" and term.win and not vim.api.nvim_win_is_valid(term.win) then
+      terms[key] = nil
+      vim.g.nvchad_terms = terms
+      break
+    end
+  end
+  require("nvchad.term").toggle { pos = "float", id = "floatTerm" }
+end
+map({ "n", "t" }, "<A-i>", toggle_float_terminal, { desc = "Toggle floating terminal" })
+
 -- C/C++
 local c = function(fn) return function() require("utils.c")[fn]() end end
 -- map("n", "<leader>cc", c "cmake_configure", { desc = "C: CMake Configure" })
