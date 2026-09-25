@@ -44,6 +44,11 @@ return {
       -- Routes vim.ui.select (LSP code actions, refactor/rename picks, etc.) through Telescope.
       "nvim-telescope/telescope-ui-select.nvim",
     },
+    keys = {
+      { "<leader>bb", function() require("telescope.builtin").buffers { sort_mru = true, sort_lastused = true, previewer = false } end, desc = "List Buffers" },
+      { "<leader>bn", "<cmd>bnext<cr>", desc = "Next Buffer" },
+      { "<leader>bp", "<cmd>bprevious<cr>", desc = "Previous Buffer" },
+    },
     config = function()
       local actions = require "telescope.actions"
       local action_state = require "telescope.actions.state"
