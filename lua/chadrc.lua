@@ -58,8 +58,8 @@ M.ui = {
     enabled = false,
   },
   statusline = {
-    theme = "vscode",
-    separator_style = "round",
+    theme = "default",
+    separator_style = "default",
     order = { "mode", "git", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
     modules = { diagnostics = function() return require("utils.workspace_diagnostics").statusline() end },
   },
