@@ -7,6 +7,14 @@ require "nvchad.autocmds"
 local autocmd = vim.api.nvim_create_autocmd
 local augroup = vim.api.nvim_create_augroup
 
+-- Keep the macro register indicator in the statusline up to date.
+autocmd({ "RecordingEnter", "RecordingLeave" }, {
+  group = augroup("MacroRecordingStatusline", { clear = true }),
+  callback = function()
+    vim.cmd "redrawstatus"
+  end,
+})
+
 local bigfile_group = augroup("BigFileGuard", { clear = true })
 
 -- ponytail: guard against accidental huge-buffer spikes.

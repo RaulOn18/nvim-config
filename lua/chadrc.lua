@@ -1,6 +1,15 @@
 ---@type ChadrcConfig
 local M = {}
 
+local function macro_recording()
+  local register = vim.fn.reg_recording()
+  if register == "" then
+    return ""
+  end
+
+  return "%#St_lspWarning# 󰑋 REC @" .. register .. " "
+end
+
 M.base46 = {
   theme = "material-deep-ocean",
   transparency = true,
@@ -33,8 +42,11 @@ M.ui = {
   statusline = {
     theme = "default",
     separator_style = "default",
-    order = { "mode", "git", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
-    modules = { diagnostics = function() return require("utils.workspace_diagnostics").statusline() end },
+    order = { "mode", "macro_recording", "git", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
+    modules = {
+      diagnostics = function() return require "utils.workspace_diagnostics".statusline() end,
+      macro_recording = macro_recording,
+    },
   },
 }
 
