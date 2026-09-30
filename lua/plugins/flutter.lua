@@ -57,10 +57,6 @@ return {
         debugger = {
           enabled = true,
           run_via_dap = false,
-          register_configurations = function(_)
-            require("dap").configurations.dart = {}
-            require("dap.ext.vscode").load_launchjs()
-          end,
         },
         widget_guides = { enabled = false },
         closing_tags = { enabled = false },
