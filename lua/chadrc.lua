@@ -1,41 +1,11 @@
 ---@type ChadrcConfig
 local M = {}
 
-local function set_file_header(args)
-  local win = vim.api.nvim_get_current_win()
-  local config = vim.api.nvim_win_get_config(win)
-  local buftype = vim.bo[args.buf].buftype
-
-  -- Floating pickers need every available row; winbar can trigger E36 there.
-  if config.relative ~= "" or buftype ~= "" then
-    vim.wo[win].winbar = ""
-    return
-  end
-
-  local name = vim.api.nvim_buf_get_name(args.buf)
-  local display = name ~= "" and vim.fn.fnamemodify(name, ":~:.") or "[No Name]"
-  local icon = "󰈔"
-  vim.wo[win].winbar = "  " .. icon .. "  " .. display .. "  %="
-end
-
-vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "WinEnter", "DirChanged" }, {
-  group = vim.api.nvim_create_augroup("FileHeader", { clear = true }),
-  callback = function(args)
-    vim.schedule(function()
-      if vim.api.nvim_buf_is_valid(args.buf) and vim.api.nvim_win_is_valid(vim.api.nvim_get_current_win()) then
-        set_file_header(args)
-      end
-    end)
-  end,
-})
-
 M.base46 = {
   theme = "material-deep-ocean",
   transparency = true,
   hl_override = {
     Comment = { italic = true },
-    WinBar = { fg = "#8be9fd", bg = "#1b2030", bold = true },
-    WinBarNC = { fg = "#6272a4", bg = "#171a26" },
     StatusLine = { bg = "#171a26" },
     StatusLineNC = { bg = "#171a26" },
     ["@comment"] = { italic = true },
@@ -54,8 +24,11 @@ M.base46 = {
 }
 
 M.ui = {
+  -- Use NvChad's native per-tab bufferline and mappings.
   tabufline = {
-    enabled = false,
+    enabled = true,
+    lazyload = true,
+    bufwidth = 24,
   },
   statusline = {
     theme = "default",

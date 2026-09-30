@@ -41,19 +41,11 @@ map("n", "<leader>cp", function() copy_path { line = true } end, { desc = "Copy 
 map("n", "<leader>cP", function() copy_path {} end, { desc = "Copy path" })
 map("v", "<leader>cp", function() copy_path { range = true } end, { desc = "Copy path:lines" })
 
--- NvChad terminal can retain a closed float after its shell exits.
-local function toggle_float_terminal()
-  local terms = vim.g.nvchad_terms or {}
-  for key, term in pairs(terms) do
-    if term.id == "floatTerm" and term.win and not vim.api.nvim_win_is_valid(term.win) then
-      terms[key] = nil
-      vim.g.nvchad_terms = terms
-      break
-    end
-  end
+-- Keep NvChad's terminal registry intact: a hidden float has an invalid window,
+-- but its terminal buffer is still the session we want to restore.
+map({ "n", "t" }, "<A-i>", function()
   require("nvchad.term").toggle { pos = "float", id = "floatTerm" }
-end
-map({ "n", "t" }, "<A-i>", toggle_float_terminal, { desc = "Toggle floating terminal" })
+end, { desc = "Toggle floating terminal" })
 
 -- C/C++
 local c = function(fn) return function() require("utils.c")[fn]() end end
@@ -63,17 +55,3 @@ local c = function(fn) return function() require("utils.c")[fn]() end end
 -- map("n", "<leader>cX", c "run_with_args", { desc = "C: Run with args" })
 -- map("n", "<leader>ch", c "switch_header", { desc = "C: Switch header/source" })
 
--- Close current buffer and return to the previously active (alternate) one.
--- Falls back to default bdelete when no alternate exists.
-local function close_buffer()
-  local cur = vim.api.nvim_get_current_buf()
-  local alt = vim.fn.bufnr("#")
-  if alt ~= -1 and alt ~= cur and vim.api.nvim_buf_is_loaded(alt) then
-    vim.cmd("b#")
-    pcall(vim.cmd, "confirm bdelete " .. cur)
-  else
-    pcall(vim.cmd, "confirm bdelete " .. cur)
-  end
-end
-map("n", "<leader>bd", close_buffer, { desc = "Close buffer (return to previous)" })
-map("n", "<leader>x", close_buffer, { desc = "Close buffer (return to previous)" })
