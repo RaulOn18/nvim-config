@@ -47,10 +47,13 @@ return {
     end,
   },
 
-  -- Local checkout until Prime Agent support is published upstream.
+  -- pi.nvim: minimal CLI agent integration (https://github.com/pablopunk/pi.nvim)
   {
-    dir = "/home/raulon/Projects/Git/pi.nvim",
-    cmd = { "PiAsk", "PiAskSelection", "PiCancel", "PiLog" },
+    "pablopunk/pi.nvim",
+    cmd = { "PiAsk", "PiAskSelection", "PiCancel", "PiToggleSession", "PiLog" },
+    keys = {
+      { "<leader>ai", ":PiAsk<CR>", desc = "Ask pi", mode = { "n", "v" } },
+    },
     config = function()
       require("pi").setup()
     end,

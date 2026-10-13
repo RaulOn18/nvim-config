@@ -42,10 +42,30 @@ M.ui = {
   statusline = {
     theme = "default",
     separator_style = "default",
-    order = { "mode", "macro_recording", "git", "%=", "lsp_msg", "%=", "diagnostics", "lsp", "cwd", "cursor" },
+    order = {
+      "mode",
+      "macro_recording",
+      "git",
+      "%=",
+      "pi_status",
+      "lsp_loading",
+      "%=",
+      "diagnostics",
+      "lsp",
+      "cwd",
+      "cursor",
+    },
     modules = {
-      diagnostics = function() return require "utils.workspace_diagnostics".statusline() end,
+      diagnostics = function()
+        return require("utils.workspace_diagnostics").statusline()
+      end,
       macro_recording = macro_recording,
+      pi_status = function()
+        return require("utils.status_hud").pi()
+      end,
+      lsp_loading = function()
+        return require("utils.status_hud").lsp()
+      end,
     },
   },
 }
@@ -54,8 +74,12 @@ M.term = {
   winopts = { number = false, relativenumber = false },
   sizes = { sp = 0.3, vsp = 0.2, ["bo sp"] = 0.3, ["bo vsp"] = 0.2 },
   float = {
-    relative = "editor", row = 0.1, col = 0.1,
-    width = 0.7, height = 0.7, border = "single",
+    relative = "editor",
+    row = 0.1,
+    col = 0.1,
+    width = 0.7,
+    height = 0.7,
+    border = "single",
   },
 }
 

@@ -47,11 +47,4 @@ map({ "n", "t" }, "<A-i>", function()
   require("nvchad.term").toggle { pos = "float", id = "floatTerm" }
 end, { desc = "Toggle floating terminal" })
 
--- C/C++
-local c = function(fn) return function() require("utils.c")[fn]() end end
--- map("n", "<leader>cc", c "cmake_configure", { desc = "C: CMake Configure" })
--- map("n", "<leader>cb", c "build", { desc = "C: Build" })
--- map("n", "<leader>cx", c "run", { desc = "C: Run" })
--- map("n", "<leader>cX", c "run_with_args", { desc = "C: Run with args" })
--- map("n", "<leader>ch", c "switch_header", { desc = "C: Switch header/source" })
 
